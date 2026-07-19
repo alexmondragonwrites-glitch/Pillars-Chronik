@@ -1,8 +1,52 @@
 [
   {
+    "slug": "die-letzte-unterrichtsstunde",
+    "title": "Die letzte Unterrichtsstunde",
+    "type": "Prolog",
+    "date": "Vor der Reise",
+    "machineDate": "2823-05-18",
+    "location": "Aedyr",
+    "summary": "Als ihre Schule schließen musste, verließ Serin nicht nur ein Gebäude. Sie ließ jene Kinder zurück, denen sie beigebracht hatte, Fragen zu stellen, und nahm ihre eigenen unbeantworteten Fragen mit nach Dyrwood.",
+    "journal": [
+      "Am letzten Morgen stand noch Kreidestaub auf dem Pult. Die Bänke waren leer, doch ich glaubte beinahe, das Rascheln der Seiten und das unterdrückte Lachen meiner Schüler zu hören.",
+      "Ich hatte ihnen Lesen und Schreiben beigebracht, Geschichten von Göttern erzählt und sie zugleich ermutigt, auch einer alten Geschichte nicht allein deshalb zu glauben, weil sie alt war.",
+      "Als die Schule schließen musste, blieb mir kein großer Abschied. Nur Bücher, einige Notizen und die Erkenntnis, dass Wissen einen Ort verlieren kann, ohne zu verschwinden.",
+      "Im Dyrwald, so hieß es, würden Kolonisten gebraucht. Ich suchte kein Vermögen. Ich suchte einen kleinen Raum, ein Dach und vielleicht eines Tages wieder Kinder, die Fragen stellten."
+    ],
+    "decision": {
+      "title": "Aedyr verlassen",
+      "choice": "Serin schloss sich einer Kolonistenkarawane in Richtung Goldtal an.",
+      "consequence": "Sie ließ Sicherheit und Vergangenheit zurück, um anderswo erneut als Lehrerin beginnen zu können.",
+      "analysis": "Die Reise entstand nicht aus Abenteuerlust, sondern aus Verantwortung gegenüber dem Teil ihres Lebens, den sie noch retten konnte.",
+      "lesson": "Ein Neuanfang ist selten leer. Meist trägt er die Stimmen dessen in sich, was man zurücklassen musste."
+    }
+  },
+  {
+    "slug": "der-wind-von-cilant-lis",
+    "title": "Der Wind von Cilant Lîs",
+    "type": "Kapitel I",
+    "date": "19. Majprima, 2823 KI",
+    "machineDate": "2823-05-19",
+    "location": "Vor den Ruinen von Cilant Lîs",
+    "summary": "Die Reise nach Goldtal endete nicht an einem Tor, sondern unter einem unnatürlichen Himmel. Krankheit, Gewalt und ein tödlicher Bîaŵac trieben Serin, Calisca und Heodan in die alten Ruinen.",
+    "journal": [
+      "Die Karawane hatte mir klein erschienen, als wir aufbrachen. Nun, da der Wind durch das Tal heulte, wirkte jeder Mensch darin noch kleiner.",
+      "Es war kein gewöhnlicher Sturm. Die Luft selbst schien sich zusammenzuziehen, als würde etwas Unsichtbares Atem holen. Der Karawanenmeister hatte uns vor den Ruinen gewarnt. Trotzdem blieb uns kein anderer Weg.",
+      "Männer von Eir Glanfath stellten sich uns entgegen. Ich sagte ihnen, dass unsere Hände die Ruinen nicht besudelt hatten. Als ich die Tierzähne am Hals ihres Anführers sah, fragte ich ihn, ob Galawain von ihm blinden Gehorsam oder wahrhaftigen Schutz verlangen würde.",
+      "Für einen Augenblick glaubte ich, Worte könnten die Klingen senken. Dann brach die Welt wieder in Bewegung aus."
+    ],
+    "decision": {
+      "title": "Die Sprache ihres Glaubens wählen",
+      "choice": "Serin verteidigte sich mit Respekt und sprach den glanfathanischen Anführer auf Galawain und seine eigene Verantwortung an.",
+      "consequence": "Sie blieb ihrer Haltung treu: erst verstehen, dann urteilen, und nur kämpfen, wenn Worte keinen Raum mehr finden.",
+      "analysis": "Serin nutzt Wissen nicht als Waffe der Überlegenheit, sondern als Brücke. Doch selbst die richtige Frage garantiert keine friedliche Antwort.",
+      "lesson": "Respekt kann einen Konflikt öffnen. Er kann ihn nicht immer beenden."
+    }
+  },
+  {
     "slug": "der-augenblick-in-dem-sie-wartete",
     "title": "Der Augenblick, in dem sie wartete",
-    "type": "Schlüsselmoment",
+    "type": "Kapitel II · Schlüsselmoment",
     "date": "19. Majprima, 2823 KI",
     "machineDate": "2823-05-19",
     "location": "Die Ruinen von Cilant Lîs",
@@ -11,7 +55,7 @@
       "Heodan ist tot.",
       "Ich hätte handeln können. Vielleicht hätte mein Schuss ihn getroffen. Vielleicht hätte ich den Mann getroffen, der ihn festhielt. Vielleicht wäre alles nur noch schlimmer geworden.",
       "Ich entschied mich zu warten. Ihm zu vertrauen.",
-      "Nun ist er tot, und alle Möglichkeiten, die ich in jenem Augenblick gegeneinander abwog, bedeuten nichts mehr. Nur die eine Wirklichkeit bleibt.",
+      "Dann erfasste ihn die spektrale Energie. All die Möglichkeiten, die ich in jenem Augenblick gegeneinander abgewogen hatte, verschwanden. Nur eine Wirklichkeit blieb.",
       "Früher sagte ich meinen Schülern, sie sollten erst denken und dann handeln. Heute frage ich mich, wie lange ein Gedanke dauern darf, bevor er zur Ausrede wird.",
       "Calisca und ich müssen weiter. Ich werde Heodans Namen nicht vergessen."
     ],
@@ -21,6 +65,29 @@
       "consequence": "Spektrale Energie tötete Heodan, bevor er sich befreien konnte.",
       "analysis": "Die Entscheidung entstand aus Vorsicht und Vertrauen, nicht aus Gleichgültigkeit. Dennoch musste Serin erkennen, dass gute Absichten die Verantwortung für eine Folge nicht auslöschen.",
       "lesson": "Auch Nichtstun ist eine Entscheidung. Manchmal trägt Zurückhaltung dieselbe Schuld wie eine falsch geführte Waffe."
+    }
+  },
+  {
+    "slug": "eine-kurze-verschnaufpause",
+    "title": "Eine kurze Verschnaufpause",
+    "type": "Kapitel III",
+    "date": "19. Majprima, 2823 KI · Stunde 2",
+    "machineDate": "2823-05-19",
+    "location": "Biwak in den Ruinen",
+    "summary": "Tiefer in den Ruinen finden Serin und Calisca einen Augenblick der Ruhe. Der Weg nach Goldtal liegt noch vor ihnen, doch Serins erhoffter Neuanfang trägt bereits den Namen eines Toten.",
+    "journal": [
+      "Wir haben einen Ort gefunden, an dem der Wind nur noch wie eine ferne Erinnerung klingt. Calisca schläft nicht wirklich. Ich auch nicht.",
+      "Meine Hände zittern erst jetzt, da sie nichts mehr tun müssen. Auf Reisen erzählt man sich, ein Feuer mache jeden Ort für eine Nacht zu einem Zuhause. Dieses Feuer wärmt, aber es tröstet nicht.",
+      "Ich dachte, der schwierigste Teil meines Aufbruchs sei der Abschied von Aedyr gewesen. Nun weiß ich, dass ein Weg nicht nur durch Entfernungen führt. Manchmal führt er durch einen Augenblick, zu dem man immer wieder zurückkehrt.",
+      "Morgen werden wir einen Ausgang suchen. Danach Goldtal. Vielleicht gibt es dort noch immer ein Haus, einen Garten und eine Schule, die nur darauf wartet, eröffnet zu werden.",
+      "Doch die Frau, die dort ankommen wird, ist nicht mehr ganz jene, die Aedyr verlassen hat."
+    ],
+    "decision": {
+      "title": "Weitergehen, ohne zu vergessen",
+      "choice": "Serin ruht mit Calisca im Biwak und hält Heodans Tod schriftlich fest.",
+      "consequence": "Aus dem Verlust entsteht keine Härte, sondern ein neues Verständnis von Verantwortung.",
+      "analysis": "Serin erlaubt sich Trauer, ohne ihre ursprünglichen Ziele aufzugeben. Der Neuanfang bleibt bestehen, ist aber nicht länger unschuldig.",
+      "lesson": "Weiterzugehen bedeutet nicht, etwas hinter sich zu lassen. Manches nimmt im Weitergehen erst seinen festen Platz ein."
     }
   }
 ]
