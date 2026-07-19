@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Die Gesänge der Serin Ashwyn – ein erzählerisches Webtagebuch zu Pillars of Eternity.">
-  <meta name="theme-color" content="#173d2d">
+  <meta name="description" content="Die Gesänge der Serin Ashwyn – ein mondbeschienenes Webtagebuch zu Pillars of Eternity.">
+  <meta name="theme-color" content="#240d18">
   <title>Die Gesänge der Serin Ashwyn</title>
   <link rel="stylesheet" href="./styles.css">
   <script src="./app.js" defer></script>
@@ -15,62 +15,59 @@
   <header class="site-header">
     <a class="brand" href="#top" aria-label="Zur Startseite">
       <span class="brand-mark" aria-hidden="true">☾</span>
-      <span>
-        <strong>Serin Ashwyn</strong>
-        <small>Die Gesänge einer Wächterin</small>
-      </span>
+      <span><strong>Serin Ashwyn</strong><small>Die Gesänge einer Wächterin</small></span>
     </a>
     <nav aria-label="Hauptnavigation">
       <a href="#chronik">Chronik</a>
       <a href="#serin">Serin</a>
-      <a href="#entscheidungen">Entscheidungen</a>
+      <a href="#entscheidungen">Spuren</a>
     </nav>
   </header>
 
   <main id="top">
     <section class="hero" aria-labelledby="hero-title">
+      <div class="stars" aria-hidden="true"></div>
+      <div class="moon-orbit" aria-hidden="true"><span class="moon"></span><span class="orbit-line"></span></div>
       <div class="hero-copy">
-        <p class="eyebrow">Ein Webtagebuch aus Eora</p>
+        <p class="eyebrow">Eine Chronik aus Eora</p>
         <h1 id="hero-title">Die Gesänge der<br><em>Serin Ashwyn</em></h1>
-        <p class="lede">Eine Lehrerin wollte Kindern helfen, die Welt zu verstehen. Dann zwang die Welt sie, ihre eigene Seele zu lesen.</p>
-        <blockquote>„Mut bedeutet nicht, keine Angst zu haben. Mut bedeutet, trotzdem zu singen.“</blockquote>
-        <a class="primary-action" href="#chronik">Die Chronik öffnen <span aria-hidden="true">↓</span></a>
+        <p class="lede">Eine Lehrerin verließ Aedyr, um neu zu beginnen. Noch vor dem ersten Dorf lernte sie, dass auch Zögern eine Entscheidung ist.</p>
+        <blockquote>„Ich wollte Kindern beibringen, die Welt zu verstehen. Stattdessen zwang die Welt mich, meine Seele zu verstehen.“</blockquote>
+        <a class="primary-action" href="#chronik">Das erste Blatt öffnen <span aria-hidden="true">☽</span></a>
       </div>
       <figure class="hero-portrait">
+        <div class="portrait-halo" aria-hidden="true"></div>
         <img src="./assets/serin-ashwyn-character-sheet.svg" alt="Charakterblatt von Serin Ashwyn mit Porträt, Herkunft, Überzeugungen und Zielen">
         <figcaption>Mondgottgleiche · Sängerin · Lehrerin · aus Aedyr</figcaption>
       </figure>
     </section>
 
+    <div class="moon-divider" aria-hidden="true"><span>☾</span></div>
+
     <section class="chapter-intro" id="chronik" aria-labelledby="chronik-title">
-      <p class="eyebrow">Fortlaufende Aufzeichnungen</p>
-      <h2 id="chronik-title">Chronik</h2>
-      <p>Keine makellose Heldensage. Eine Sammlung jener Augenblicke, in denen Entscheidungen Narben, Zweifel und neue Überzeugungen hinterlassen.</p>
+      <p class="eyebrow">Erstes Buch · Der Weg nach Goldtal</p>
+      <h2 id="chronik-title">Die Chronik</h2>
+      <p>Keine makellose Heldensage. Eine Sammlung jener Augenblicke, in denen Hoffnung, Verlust und Verantwortung ihre Handschrift hinterlassen.</p>
     </section>
 
     <section class="timeline" aria-live="polite">
-      <div id="entries" class="entries-grid">
-        <article class="entry-card loading-card">
-          <p>Die Seiten der Chronik werden geöffnet …</p>
-        </article>
-      </div>
+      <div id="entries" class="entries-grid"><article class="entry-card loading-card"><p>Die Seiten der Chronik werden geöffnet …</p></article></div>
     </section>
 
     <section class="profile-section" id="serin" aria-labelledby="serin-title">
+      <div class="profile-moon" aria-hidden="true">☽</div>
       <div class="section-heading">
-        <p class="eyebrow">Die Frau hinter der Legende</p>
+        <p class="eyebrow">Unter rotem Tuch und kaltem Mondlicht</p>
         <h2 id="serin-title">Serin Ashwyn</h2>
       </div>
-      <div id="profile" class="profile-grid">
-        <p>Serins Aufzeichnungen werden geladen …</p>
-      </div>
+      <div id="profile" class="profile-grid"><p>Serins Aufzeichnungen werden geladen …</p></div>
     </section>
 
     <section class="decision-section" id="entscheidungen" aria-labelledby="decision-title">
       <div class="decision-copy">
-        <p class="eyebrow">Spuren im Charakter</p>
-        <h2 id="decision-title">Entscheidungen formen die Wächterin</h2>
-        <p>Serin sucht Verständnis, bevor sie urteilt. Doch ihre Reise lehrt sie, dass auch Zögern handelt und Schweigen eine Richtung wählen kann.</p>
+        <p class="eyebrow">Narben im Denken</p>
+        <h2 id="decision-title">Was die Wächterin verändert</h2>
+        <p>Serin beginnt ihre Reise mit Vertrauen in Vernunft, Mitgefühl und die Kraft der Worte. Die Chronik hält fest, was davon bleibt und was neu geboren wird.</p>
       </div>
       <div id="decision-ledger" class="decision-ledger" aria-live="polite"></div>
     </section>
