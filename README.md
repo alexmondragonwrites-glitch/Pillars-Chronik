@@ -26,3 +26,7 @@ Die statische Website liegt direkt im Repository und wird über GitHub Pages ver
 Serin wollte Heodan in den Ruinen von Cilant Lîs die Möglichkeit geben, sich selbst zu befreien. Er starb durch spektrale Energie. Dieser Verlust ist kein zurückgesetzter Spielstand, sondern der erste prägende Riss in Serins Weltbild:
 
 > Auch Nichtstun ist eine Entscheidung. Manchmal trägt Zurückhaltung dieselbe Schuld wie eine falsch geführte Waffe.
+
+## Deployment
+
+GitHub Pages verwendet **GitHub Actions** als Quelle. Diese Änderung stößt den ersten Deployment-Lauf nach der Aktivierung erneut an.
