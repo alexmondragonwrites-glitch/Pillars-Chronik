@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Die Gesänge der Serin Ashwyn – ein erzählerisches Webtagebuch zu Pillars of Eternity.">
+  <meta name="theme-color" content="#173d2d">
+  <title>Die Gesänge der Serin Ashwyn</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#chronik">Zur Chronik springen</a>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Zur Startseite">
+      <span class="brand-mark" aria-hidden="true">☾</span>
+      <span>
+        <strong>Serin Ashwyn</strong>
+        <small>Die Gesänge einer Wächterin</small>
+      </span>
+    </a>
+    <nav aria-label="Hauptnavigation">
+      <a href="#chronik">Chronik</a>
+      <a href="#serin">Serin</a>
+      <a href="#entscheidungen">Entscheidungen</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Ein Webtagebuch aus Eora</p>
+        <h1 id="hero-title">Die Gesänge der<br><em>Serin Ashwyn</em></h1>
+        <p class="lede">Eine Lehrerin wollte Kindern helfen, die Welt zu verstehen. Dann zwang die Welt sie, ihre eigene Seele zu lesen.</p>
+        <blockquote>„Mut bedeutet nicht, keine Angst zu haben. Mut bedeutet, trotzdem zu singen.“</blockquote>
+        <a class="primary-action" href="#chronik">Die Chronik öffnen <span aria-hidden="true">↓</span></a>
+      </div>
+      <figure class="hero-portrait">
+        <img src="./assets/serin-ashwyn-character-sheet.svg" alt="Charakterblatt von Serin Ashwyn mit Porträt, Herkunft, Überzeugungen und Zielen">
+        <figcaption>Mondgottgleiche · Sängerin · Lehrerin · aus Aedyr</figcaption>
+      </figure>
+    </section>
+
+    <section class="chapter-intro" id="chronik" aria-labelledby="chronik-title">
+      <p class="eyebrow">Fortlaufende Aufzeichnungen</p>
+      <h2 id="chronik-title">Chronik</h2>
+      <p>Keine makellose Heldensage. Eine Sammlung jener Augenblicke, in denen Entscheidungen Narben, Zweifel und neue Überzeugungen hinterlassen.</p>
+    </section>
+
+    <section class="timeline" aria-live="polite">
+      <div id="entries" class="entries-grid">
+        <article class="entry-card loading-card">
+          <p>Die Seiten der Chronik werden geöffnet …</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="profile-section" id="serin" aria-labelledby="serin-title">
+      <div class="section-heading">
+        <p class="eyebrow">Die Frau hinter der Legende</p>
+        <h2 id="serin-title">Serin Ashwyn</h2>
+      </div>
+      <div id="profile" class="profile-grid">
+        <p>Serins Aufzeichnungen werden geladen …</p>
+      </div>
+    </section>
+
+    <section class="decision-section" id="entscheidungen" aria-labelledby="decision-title">
+      <div class="decision-copy">
+        <p class="eyebrow">Spuren im Charakter</p>
+        <h2 id="decision-title">Entscheidungen formen die Wächterin</h2>
+        <p>Serin sucht Verständnis, bevor sie urteilt. Doch ihre Reise lehrt sie, dass auch Zögern handelt und Schweigen eine Richtung wählen kann.</p>
+      </div>
+      <div id="decision-ledger" class="decision-ledger" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span class="footer-mark" aria-hidden="true">☾</span>
+    <p><strong>Die Gesänge der Serin Ashwyn</strong><br>Eine persönliche Chronik aus <em>Pillars of Eternity</em>.</p>
+    <a href="https://github.com/alexmondragonwrites-glitch/Pillars-Chronik">Quellchronik auf GitHub</a>
+  </footer>
+</body>
+</html>
