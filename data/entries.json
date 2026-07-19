@@ -1,0 +1,26 @@
+[
+  {
+    "slug": "der-augenblick-in-dem-sie-wartete",
+    "title": "Der Augenblick, in dem sie wartete",
+    "type": "Schlüsselmoment",
+    "date": "19. Majprima, 2823 KI",
+    "machineDate": "2823-05-19",
+    "location": "Die Ruinen von Cilant Lîs",
+    "summary": "Serin vertraute darauf, dass Heodan sich aus dem Griff seines Angreifers befreien würde. Ihre Zurückhaltung sollte sein Leben nicht zusätzlich gefährden. Stattdessen kostete sie ihn die letzte Möglichkeit auf Rettung.",
+    "journal": [
+      "Heodan ist tot.",
+      "Ich hätte handeln können. Vielleicht hätte mein Schuss ihn getroffen. Vielleicht hätte ich den Mann getroffen, der ihn festhielt. Vielleicht wäre alles nur noch schlimmer geworden.",
+      "Ich entschied mich zu warten. Ihm zu vertrauen.",
+      "Nun ist er tot, und alle Möglichkeiten, die ich in jenem Augenblick gegeneinander abwog, bedeuten nichts mehr. Nur die eine Wirklichkeit bleibt.",
+      "Früher sagte ich meinen Schülern, sie sollten erst denken und dann handeln. Heute frage ich mich, wie lange ein Gedanke dauern darf, bevor er zur Ausrede wird.",
+      "Calisca und ich müssen weiter. Ich werde Heodans Namen nicht vergessen."
+    ],
+    "decision": {
+      "title": "Heodan sich selbst befreien lassen",
+      "choice": "Serin griff nicht an und gewährte Heodan den Raum, sich selbst zu retten.",
+      "consequence": "Spektrale Energie tötete Heodan, bevor er sich befreien konnte.",
+      "analysis": "Die Entscheidung entstand aus Vorsicht und Vertrauen, nicht aus Gleichgültigkeit. Dennoch musste Serin erkennen, dass gute Absichten die Verantwortung für eine Folge nicht auslöschen.",
+      "lesson": "Auch Nichtstun ist eine Entscheidung. Manchmal trägt Zurückhaltung dieselbe Schuld wie eine falsch geführte Waffe."
+    }
+  }
+]
