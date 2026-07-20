@@ -2,6 +2,8 @@
   "name": "Serin Ashwyn",
   "identity": "Mondgottgleiche, Sängerin, Lehrerin und Kolonistin",
   "origin": "Eine kleine Küstenstadt in Aedyr",
+  "level": 2,
+  "combatRole": "Unterstützende Sängerin in der zweiten Reihe",
   "motto": "Ich wollte Kindern beibringen, die Welt zu verstehen. Stattdessen zwang die Welt mich, meine Seele zu verstehen.",
   "biography": [
     "Serin Ashwyn wurde in einer kleinen Küstenstadt Aedyrs geboren. Ihre Mutter arbeitete als Hebamme, ihr Vater als Schreiber im Dienst der Stadt. Zwischen Tinte, Heilkräutern und alten Geschichten wuchs in ihr die Überzeugung, dass Wissen und Mitgefühl die Welt verändern können.",
@@ -21,5 +23,26 @@
     "Eines Tages wieder eine Schule eröffnen",
     "Wissen bewahren und weitergeben",
     "Die Geheimnisse der Welt und der Seele verstehen"
+  ],
+  "skills": {
+    "Heimlichkeit": 0,
+    "Athletik": 2,
+    "Wissen": 3,
+    "Mechanik": 1,
+    "Überleben": 2
+  },
+  "progression": [
+    {
+      "level": 2,
+      "title": "Das erste Lied nach dem Erwachen",
+      "context": "Nach den Ereignissen an der Adra-Maschine von Cilant Lîs",
+      "skillChanges": [
+        "Wissen 2 → 3",
+        "Athletik 0 → 2"
+      ],
+      "invocation": "Reny Darets Geist sollte jedoch nicht ruhen",
+      "talent": "Uralte Erinnerung",
+      "meaning": "Serin entwickelt sich nicht zur Zerstörerin, sondern zur Bewahrerin. Ihr Wissen wächst, ihre Reise macht sie widerstandsfähiger, und ihre Stimme trägt fortan sowohl die Erinnerung der Toten als auch neue Kraft für die Lebenden."
+    }
   ]
 }
