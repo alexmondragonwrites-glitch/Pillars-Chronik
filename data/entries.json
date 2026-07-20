@@ -89,5 +89,51 @@
       "analysis": "Serin erlaubt sich Trauer, ohne ihre ursprünglichen Ziele aufzugeben. Der Neuanfang bleibt bestehen, ist aber nicht länger unschuldig.",
       "lesson": "Weiterzugehen bedeutet nicht, etwas hinter sich zu lassen. Manches nimmt im Weitergehen erst seinen festen Platz ein."
     }
+  },
+  {
+    "slug": "die-ruhe-der-ueberlebenden",
+    "title": "Die Ruhe der Überlebenden",
+    "type": "Gesprächsfetzen",
+    "date": "19. Majprima, 2823 KI · Stunde 2",
+    "machineDate": "2823-05-19",
+    "location": "Biwak in den Ruinen",
+    "summary": "Calisca erzählt Serin vom Bîaŵac, vom Weg der Götter und davon, warum manche Menschen selbst nach Schlimmem weitergehen. Hinter ihrer ruhigen Stimme liegt kein Mangel an Trauer, sondern geübtes Überleben.",
+    "journal": [
+      "Calisca sprach über den Bîaŵac, als erzähle sie von einem alten Winter. Für die Glanfathaner sei er der Weg der Götter, auf dem die Seelen des Landes jene ernten, die ihren Ausweg nicht allein finden konnten. Lebende und Tote mache der Sturm dabei nicht auseinander.",
+      "Dann fragte sie mich, ob ich meine Seele noch hätte. Ich wusste keine Antwort. Seit dem Wind fühlte sich etwas in mir nicht fort, sondern verschoben an, als wäre eine Seite meines Lebens falsch wieder eingelegt worden.",
+      "Als ich bemerkte, wie wenig aufgeregt sie wirkte, sah sie mir direkt in die Augen. Vielleicht, sagte sie, kenne ich sie nur noch nicht gut genug, um zu wissen, wie Aufregung bei ihr aussieht.",
+      "Sie sei weitergegangen, weil man manchmal nichts anderes könne und weil es noch Menschen gebe, die einem etwas bedeuteten und einen brauchten.",
+      "Vielleicht ist Stärke nicht die Abwesenheit von Schmerz. Vielleicht ist sie die Entscheidung, ihm nicht das letzte Wort zu überlassen."
+    ],
+    "decision": {
+      "title": "Caliscas Trauer nicht mit Gleichgültigkeit verwechseln",
+      "choice": "Serin fragt nach und hört zu, statt Caliscas Ruhe vorschnell zu beurteilen.",
+      "consequence": "Sie erkennt in Calisca keine gefühllose Kämpferin, sondern eine Frau, die gelernt hat, ihre Trauer zu tragen und trotzdem gebraucht zu werden.",
+      "analysis": "Die Lehrerin in Serin sucht weiterhin nach dem Menschen hinter einer Haltung. Das Gespräch erinnert sie daran, dass Gefühle nicht bei jedem dieselbe Gestalt annehmen.",
+      "lesson": "Nicht jeder Schmerz spricht laut. Manche Menschen tragen ihn, indem sie weitergehen."
+    }
+  },
+  {
+    "slug": "die-erhobenen-arme",
+    "title": "Die erhobenen Arme",
+    "type": "Begegnung",
+    "date": "19. Majprima, 2823 KI",
+    "machineDate": "2823-05-19",
+    "location": "Die Ruinen von Cilant Lîs",
+    "summary": "Ein kränklicher Xaurip tritt Serin mit einem Speer entgegen. Statt seine Angst mit einer Drohung zu beantworten, hebt sie langsam die Arme und lässt ihn selbst entscheiden, ob von ihr Gefahr ausgeht.",
+    "journal": [
+      "Aus der Dunkelheit trat eine zitternde Gestalt. Schuppige Haut spannte sich über dürre Rippen, und jeder Atemzug kam in flatternden Seufzern. Trotzdem hielt der Xaurip seinen Speer fest.",
+      "Ich hob die Arme und blieb stehen.",
+      "Er kam näher, den Kopf zur Seite geneigt, und stieß ein weiches, kehliges Klicken aus. Dann beschnüffelte er mich. Was immer er suchte, er fand es nicht. Er trat zurück, ohne den Speer zu senken.",
+      "Ich sagte ihm, dass ich ihm nichts tun würde. Vielleicht verstand er meine Worte nicht. Vielleicht verstand er nur, dass ich noch immer nicht angegriffen hatte.",
+      "Für einen kurzen Augenblick standen sich nicht Mensch und Ungeheuer gegenüber, sondern zwei verängstigte Wesen, die beide hofften, das andere würde nicht den ersten Fehler machen."
+    ],
+    "decision": {
+      "title": "Die Angst nicht mit Gewalt beantworten",
+      "choice": "Serin hob die Arme, blieb still und versprach dem Xaurip, ihm nichts zu tun.",
+      "consequence": "Der Xaurip behielt seine defensive Haltung bei, griff jedoch nicht an.",
+      "analysis": "Serin erkennt Schwäche und Furcht hinter dem Speer. Nach Heodans Tod bedeutet ihr Handeln diesmal nicht passives Warten, sondern eine bewusste, sichtbare Deeskalation.",
+      "lesson": "Frieden beginnt manchmal nicht mit einem überzeugenden Satz, sondern mit einer Bewegung, die keine Drohung enthält."
+    }
   }
 ]
