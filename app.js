@@ -53,6 +53,33 @@ function renderEntries(entries) {
 
 function renderProfile(profile) {
   const container = document.querySelector("#profile");
+  const skillSummary = Object.entries(profile.skills || {})
+    .map(([name, rank]) => `${name}: ${rank}`);
+  const progression = profile.progression || [];
+  const latestProgression = progression[progression.length - 1];
+
+  const progressionCard = latestProgression ? `
+    <article class="fact-card progression-card">
+      <p class="progression-kicker">Stufe ${escapeHtml(latestProgression.level)} · ${escapeHtml(latestProgression.context)}</p>
+      <h3>${escapeHtml(latestProgression.title)}</h3>
+      <div class="progression-grid">
+        <div>
+          <strong>Fähigkeiten</strong>
+          ${renderList(latestProgression.skillChanges)}
+        </div>
+        <div>
+          <strong>Beschwörung</strong>
+          <p>${escapeHtml(latestProgression.invocation)}</p>
+        </div>
+        <div>
+          <strong>Talent</strong>
+          <p>${escapeHtml(latestProgression.talent)}</p>
+        </div>
+      </div>
+      <p class="progression-meaning">${escapeHtml(latestProgression.meaning)}</p>
+    </article>
+  ` : "";
+
   container.innerHTML = `
     <div class="profile-story">
       ${profile.biography.map(paragraph => `<p>${escapeHtml(paragraph)}</p>`).join("")}
@@ -68,6 +95,11 @@ function renderProfile(profile) {
         <p>${escapeHtml(profile.identity)}</p>
       </article>
       <article class="fact-card">
+        <h3>Aktueller Stand</h3>
+        <p>Stufe ${escapeHtml(profile.level)} · ${escapeHtml(profile.combatRole)}</p>
+        ${renderList(skillSummary)}
+      </article>
+      <article class="fact-card">
         <h3>Überzeugungen</h3>
         ${renderList(profile.beliefs)}
       </article>
@@ -75,6 +107,7 @@ function renderProfile(profile) {
         <h3>Ziele</h3>
         ${renderList(profile.goals)}
       </article>
+      ${progressionCard}
     </div>
   `;
 }
