@@ -158,5 +158,53 @@
       "analysis": "Nicht jedes Fundstück braucht sofort eine große Deutung. Der Umhang ist zunächst ein praktischer Gegenstand. Bedeutung kann aus dem entstehen, was Serin später darin erlebt.",
       "lesson": "Erinnerungen haften nicht immer schon an Dingen. Manchmal sammeln die Dinge sie erst mit uns."
     }
+  },
+  {
+    "slug": "die-maenner-mit-den-silbernen-masken",
+    "title": "Die Männer mit den silbernen Masken",
+    "type": "Beobachtung",
+    "date": "19. Majprima, 2823 KI",
+    "machineDate": "2823-05-19",
+    "location": "Das Innere von Cilant Lîs",
+    "summary": "Serin und Calisca beobachten vier Robenträger an einer uralten Adra-Maschine. Ein maskierter Ältester spricht über Eidbinder, eine Königin, die gewesen war, und den Wert eines geopferten Lebens.",
+    "journal": [
+      "Wir blieben im Schatten. Vor einer Maschine aus gemeißeltem Adra standen vier Gestalten um einen Körper, farblos wie Stein oder Asche.",
+      "Der Älteste trug eine metallene Maske und eine schwarze Kopfbedeckung, deren Verzierungen wie dunkle Flügel aufragten. Seine Robe war mit einer Runensprache bestickt, die ich nicht kannte.",
+      "Er sprach zu dem Versteinerten, als könne dieser ihn noch hören. Von Eidbindern, Treue bis zum letzten Atemzug und einer Königin, die gewesen war. Dann wandte er sich an die anderen und verlangte von ihnen dieselbe Hingabe.",
+      "Ich verstand die Zeremonie nicht. Doch ich verstand den Ton: Hier wurde ein Tod nicht beklagt, sondern gewogen. Ein Leben galt als Beitrag, Erinnerung als Lohn und Gehorsam als Vollendung.",
+      "Wir griffen nicht ein. Nicht jedes Geheimnis lässt sich durch eine Frage öffnen. Manche muss man zunächst überleben."
+    ],
+    "decision": {
+      "title": "Im Verborgenen bleiben",
+      "choice": "Serin beobachtete das Ritual, ohne sich den Robenträgern zu erkennen zu geben.",
+      "consequence": "Sie wurde Zeugin einer fremden Zeremonie und eines Namens, dessen Bedeutung sie noch nicht erfassen konnte.",
+      "analysis": "Serins Neugier weicht nicht, doch sie erkennt, dass Wissen auch Maß und Vorsicht verlangt. Beobachten ist hier kein Zögern, sondern Selbstschutz.",
+      "lesson": "Demut beginnt dort, wo man zugibt, dass eine Wahrheit noch größer ist als das eigene Verständnis."
+    }
+  },
+  {
+    "slug": "als-die-welt-fluesterte",
+    "title": "Als die Welt flüsterte",
+    "type": "Kapitel IV · Erwachen",
+    "date": "19. Majprima, 2823 KI",
+    "machineDate": "2823-05-19",
+    "location": "Die Adra-Maschine von Cilant Lîs",
+    "summary": "Die Maschine erwacht in einem gleißenden Stoß. Serin wird in eine andere Zeit gerissen, sieht den maskierten Mann erneut und erwacht mit Stimmen im Kopf, zwischen erstarrten Körpern und neben der toten Calisca.",
+    "journal": [
+      "Für einen Augenblick verstummte der Apparat. Dann brach Licht aus ihm hervor, so hell, dass jeder Gedanke darin verbrannte.",
+      "Ich fiel, doch nicht nur zu Boden. Ich öffnete die Augen in einem anderen Raum und in einer anderen Zeit. Adra und Kupfer umgaben eine gewaltige Säule, und am Fuß der Maschine stand der Mann mit der silbernen Maske.",
+      "Ich kannte ihn nicht. Trotzdem drängte eine Frage durch meinen Verstand, größer als Sprache und dringlicher als Angst. Bevor ich sie stellen konnte, verlor ich mich erneut.",
+      "Als ich erwachte, war das Fieber verschwunden. An seine Stelle traten Flüstern, ein fortwährendes Klingeln und Bewegungen am Rand meines Blicks, die verschwanden, sobald ich mich umdrehte.",
+      "Die Robenträger waren zu Schlacke und Asche erstarrt. Von ihrem Anführer fehlte jede Spur.",
+      "Calisca lag wenige Schritte entfernt mit dem Gesicht nach unten. Unter ihrem Kopf hatte sich Blut gesammelt. Sie atmete nicht mehr.",
+      "Sie hatte gesagt, man gehe weiter, weil es Menschen gebe, die einen noch brauchten. Nun war niemand mehr bei mir. Nur Goldtal lag vor mir, und die Hoffnung, dort Hilfe zu finden, bevor das Flüstern mich ganz erreichte."
+    ],
+    "decision": {
+      "title": "Allein nach Goldtal aufbrechen",
+      "choice": "Serin verlässt den Ort der Katastrophe und sucht in Goldtal nach Hilfe und Antworten.",
+      "consequence": "Heodan und Calisca sind tot. Serin bleibt mit einer veränderten Wahrnehmung, einer unbekannten Verbindung zur Vergangenheit und dem maskierten Mann zurück.",
+      "analysis": "Dies ist keine freiwillige Heldinnenentscheidung. Der Weg bleibt als einzige vernünftige Möglichkeit. Dennoch entscheidet Serin, sich nicht dem Entsetzen zu überlassen.",
+      "lesson": "Manchmal beginnt ein neuer Lebensweg nicht mit einem Entschluss, sondern damit, dass der alte hinter einem zusammenbricht."
+    }
   }
 ]
