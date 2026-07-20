@@ -36,4 +36,29 @@ Als ihre Schule schließen musste, schloss sie sich einer Karawane in den Dyrwal
 - Wissen bewahren und weitergeben
 - die Geheimnisse der Welt und der Seele verstehen
 
+## Aktueller Spielstand
+
+**Stufe:** 2  
+**Rolle:** Unterstützende Sängerin in der zweiten Reihe
+
+### Fähigkeiten
+
+- Heimlichkeit 0
+- Athletik 2
+- Wissen 3
+- Mechanik 1
+- Überleben 2
+
+## Entwicklung
+
+### Stufe 2 – Das erste Lied nach dem Erwachen
+
+Nach den Ereignissen an der Adra-Maschine von Cilant Lîs wächst Serin nicht in Richtung roher Zerstörung. Ihre Entwicklung folgt dem, was sie schon vor ihrer Reise ausmachte: Wissen bewahren, Erinnerung tragen und anderen Halt geben.
+
+- **Fähigkeitssteigerungen:** Wissen 2 → 3, Athletik 0 → 2
+- **Neue Beschwörung:** „Reny Darets Geist sollte jedoch nicht ruhen“
+- **Neues Talent:** „Uralte Erinnerung“
+
+Der gerufene Geist steht nicht für die Versklavung eines Toten, sondern für eine Stimme, deren Geschichte noch nicht vollständig verklungen ist. Mit „Uralte Erinnerung“ wird Serins Gesang zugleich zu einer stillen Kraftquelle für ihre Gefährten. Ihr erstes Aufsteigen festigt damit ihre Rolle als Bewahrerin zwischen den Lebenden und den Erinnerungen der Verstorbenen.
+
 > „Ich wollte Kindern beibringen, die Welt zu verstehen. Stattdessen zwang die Welt mich, meine Seele zu verstehen.“
