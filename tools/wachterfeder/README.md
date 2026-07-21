@@ -48,24 +48,59 @@ Das Werkzeug:
 
 Die extrahierten Fertigkeitswerte sind persistierte Save-Werte. Angezeigte Endwerte im Spiel können durch Herkunft, Hintergrund, Ausrüstung oder andere Modifikatoren abweichen.
 
-## Dialoggraphen verbinden
+## Lokale Spielinstallation verbinden
 
-Die `.conversation`-Dateien der lokalen Spielinstallation können mit einem erzeugten Save-Snapshot verbunden werden:
+Originaldialoge und Lokalisierungsdateien werden nicht ins Repository kopiert. Wächterfeder speichert ausschließlich den lokalen Datenpfad und die Sprache in `.wachterfeder/config.json`. Dieser gesamte Ordner ist per `.gitignore` ausgeschlossen.
+
+Der Pfad kann der Spielordner oder ein beliebiger Unterordner innerhalb von `PillarsOfEternity_Data\data` sein. Für die aktuelle Installation funktioniert beispielsweise direkt:
 
 ```powershell
-python tools/wachterfeder/dialogues.py `
-  .wachterfeder\serin.snapshot.json `
-  "C:\Pfad\zu\PillarsOfEternity_Data\data\conversations\07_gilded_vale" `
-  --output .wachterfeder\serin-dialoge.json
+python tools/wachterfeder/local_dialogues.py configure `
+  "E:\SteamLibrary\steamapps\common\Pillars of Eternity\PillarsOfEternity_Data\data\localized\de\text\conversations"
 ```
 
-Mit lokalisierten Texten:
+Wächterfeder ermittelt daraus automatisch:
+
+```text
+E:\SteamLibrary\steamapps\common\Pillars of Eternity\PillarsOfEternity_Data\data\conversations
+E:\SteamLibrary\steamapps\common\Pillars of Eternity\PillarsOfEternity_Data\data\localized\de\text\conversations
+```
+
+Gespeicherte Pfade prüfen:
+
+```powershell
+python tools/wachterfeder/local_dialogues.py status
+```
+
+Einen Save-Snapshot anschließend mit den lokalen Dialogen verbinden:
+
+```powershell
+python tools/wachterfeder/local_dialogues.py report `
+  .wachterfeder\serin.snapshot.json `
+  --output .wachterfeder\serin-dialoge-de.json
+```
+
+Alternativ kann ein Pfad einmalig ohne Konfigurationsdatei übergeben werden:
+
+```powershell
+python tools/wachterfeder/local_dialogues.py report `
+  .wachterfeder\serin.snapshot.json `
+  --game-path "E:\SteamLibrary\steamapps\common\Pillars of Eternity" `
+  --language de `
+  --output .wachterfeder\serin-dialoge-de.json
+```
+
+Mit `--remember` wird ein erfolgreich geprüfter `--game-path` lokal gespeichert.
+
+## Dialoggraphen direkt verbinden
+
+Für Sonderfälle kann der niedrigere Dialogparser weiterhin mit expliziten Ordnern aufgerufen werden:
 
 ```powershell
 python tools/wachterfeder/dialogues.py `
   .wachterfeder\serin.snapshot.json `
-  "C:\Pfad\zu\PillarsOfEternity_Data\data\conversations\07_gilded_vale" `
-  --stringtable-root "C:\Pfad\zu\PillarsOfEternity_Data\data\localized\de\text\conversations\07_gilded_vale" `
+  "E:\SteamLibrary\steamapps\common\Pillars of Eternity\PillarsOfEternity_Data\data\conversations" `
+  --stringtable-root "E:\SteamLibrary\steamapps\common\Pillars of Eternity\PillarsOfEternity_Data\data\localized\de\text\conversations" `
   --output .wachterfeder\serin-dialoge-de.json
 ```
 
@@ -94,7 +129,7 @@ Der erste reale Testsave wurde am 21. Juli 2026 erfolgreich gelesen:
 - 199 markierte Dialogknoten rekonstruiert
 - Talent `TLN_Ancient_Memory` erkannt
 
-Der anschließend bereitgestellte Ordner `07_gilded_vale` enthielt 121 Dialoggraphen. Alle 20 im Save referenzierten Gespräche konnten eindeutig zugeordnet werden. Dabei wurden unter anderem Dispositionsänderungen, Queststarts, Gruppenänderungen, Gegenstandsaktionen, Cutscenes und gesetzte Globalvariablen erkannt.
+Alle 20 im Save referenzierten Gespräche konnten eindeutig mit lokalen Dialoggraphen und deutschen Stringtables verbunden werden. Dabei wurden unter anderem Dispositionsänderungen, Queststarts, Gruppenänderungen, Gegenstandsaktionen, Cutscenes und gesetzte Globalvariablen erkannt.
 
 Der Testsave, vollständige Snapshots, extrahierte Dialogtexte und Spielressourcen werden nicht ins öffentliche Repository eingecheckt.
 
@@ -104,11 +139,10 @@ Der Testsave, vollständige Snapshots, extrahierte Dialogtexte und Spielressourc
 python -m unittest discover -s tools/wachterfeder/tests -v
 ```
 
-Die Tests decken Pfaderkennung, Originalschutz, XML-Metadaten, Charakterwerte, globale Variablen, BitArray-basierte Dialogzustände, Dialoggraphen, lokalisierte Stringtables sowie sichere und mehrdeutige Pfadkanten ab.
+Die Tests decken Pfaderkennung, Originalschutz, XML-Metadaten, Charakterwerte, globale Variablen, BitArray-basierte Dialogzustände, Dialoggraphen, lokalisierte Stringtables, lokale Installationspfade sowie sichere und mehrdeutige Pfadkanten ab.
 
 ## Nächste Schritte
 
-1. Deutsche und optional englische `.stringtable`-Dateien mit den Dialoggraphen verbinden.
-2. Zwei aufeinanderfolgende Saves vergleichen, um neu gespielte Nodes und geänderte Questvariablen zeitlich zu isolieren.
-3. Sprecher-GUIDs über lokale Game-Daten in lesbare Namen übersetzen.
-4. Aus dem Diff eine bestätigungspflichtige Chronik-Vorschau erzeugen.
+1. Zwei aufeinanderfolgende Saves vergleichen, um neu gespielte Nodes und geänderte Questvariablen zeitlich zu isolieren.
+2. Sprecher-GUIDs über lokale Game-Daten in lesbare Namen übersetzen.
+3. Aus dem Diff eine bestätigungspflichtige Chronik-Vorschau erzeugen.
