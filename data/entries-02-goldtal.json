@@ -1,0 +1,73 @@
+[
+  {
+    "slug": "ein-dorf-unter-leeren-zweigen",
+    "title": "Ein Dorf unter leeren Zweigen",
+    "type": "Kapitel V · Ankunft",
+    "date": "19. Majprima, 2823 KI",
+    "machineDate": "2823-05-19",
+    "location": "Talholz und Goldtal",
+    "summary": "Serin erreicht das Dorf, das ihr einen Neuanfang versprochen hatte. Unter Goldtals Galgenbaum erfährt sie jedoch von Hohlgeburten, Raedrics Härte und einem Erben, für den drei Totenglocken schlagen.",
+    "journal": [
+      "Der Weg aus Cilant Lîs führte zunächst durch das Talholz. Dort traf ich Nonton, der in aller Eile sein Lager abbrach. Ich erzählte ihm die Wahrheit über die Karawane. Er erzählte mir von Perly, seinem Freund, den ein Bär getötet hatte. Der Dyrwald begrüßt seine Neuankömmlinge nicht, er zählt sie.",
+      "Goldtal erkannte ich nicht an einem Tor oder an Feldern, sondern an einem Baum voller Toter. Unter seinen Ästen wartete Magistrat Urgeat. Ich hatte gehofft, nach einem Haus und einer Arbeit zu fragen. Stattdessen fragte er mich nach Kindern, die ohne Seele geboren werden.",
+      "Er sprach von Waidwens Vermächtnis, von Fürst Raedrics Dekreten und von einem Dorf, das aus Angst begonnen hatte, Grausamkeit für Fürsorge zu halten. Als ich nach Hilfe für das Flüstern in meinem Kopf fragte, deutete er auf eine tote Beseelerin im Baum.",
+      "Dann schlugen die Glocken. Dreimal. Raedrics Erbe war tot oder hohlgeboren, und mit ihm starb vorerst auch das Versprechen, neuen Siedlern Land zu geben.",
+      "Ich bin in Goldtal angekommen. Doch der Ort, an dem ich ein neues Leben beginnen wollte, hängt seine Antworten an Äste."
+    ],
+    "decision": {
+      "title": "Fragen stellen, obwohl das Dorf sie für gefährlich hält",
+      "choice": "Serin berichtete ehrlich von der angegriffenen Karawane und fragte Urgeat offen nach den Hohlgeburten, dem verbotenen Tempel und ihrer Veränderung durch den Bîaŵac.",
+      "consequence": "Sie erfährt, dass Goldtal kein sicherer Zufluchtsort ist, und erhält mit der toten Beseelerin am Galgenbaum ihre erste Spur zu ihrem Erwachen.",
+      "analysis": "Serins erhoffter Neuanfang zerbricht nicht an einem einzelnen Feind, sondern an einer Gesellschaft, die Angst in Regeln verwandelt hat. Ihre Antwort darauf bleibt Wissen: hinsehen, nachfragen und die bequeme Erklärung nicht übernehmen.",
+      "lesson": "Ein Ort wird nicht dadurch zur Heimat, dass man ihn erreicht. Zuerst muss man erkennen, was er von seinen Bewohnern verlangt."
+    }
+  },
+  {
+    "slug": "der-zauberer-vor-der-schaenke",
+    "title": "Der Zauberer vor der Schänke",
+    "type": "Kapitel VI · Gefährte",
+    "date": "19. Majprima, 2823 KI",
+    "machineDate": "2823-05-19",
+    "location": "Vor der Schänke zum Schwarzen Hund",
+    "summary": "Vor Goldtals Schänke versucht Serin, einen Streit zwischen Aloth und drei Betrunkenen mit Vernunft zu lösen. Als die Worte scheitern, kämpft sie an seiner Seite und gewinnt ihren ersten neuen Gefährten.",
+    "journal": [
+      "Vor der Schänke standen drei Einheimische einem verhüllten Elfen gegenüber. Alkohol, alte Kriege und ein missverstandener Satz hatten aus einem Streit bereits eine Zündschnur gemacht.",
+      "Ich bat sie, sich zu beruhigen. Ich fragte, ob es nicht besser wäre, drinnen zu trinken, als draußen Blut zu vergießen. Sie hörten nur eine weitere Aedyranerin, die ihnen sagen wollte, wie sie sich zu verhalten hatten.",
+      "Die Klingen wurden gezogen. Also sang ich.",
+      "Nach dem Kampf stellte sich der Elf als Aloth Corfiser vor, ein ausgebildeter Zauberer aus Aedyr. Auch er war als Siedler gekommen und hatte in Goldtal statt günstigen Landes Misstrauen gefunden.",
+      "Ich erzählte ihm von der Karawane und vom Bîaŵac. Er sah mich nicht an, als wäre ich verrückt. Nur neugierig. Als er fragte, ob er sich mir anschließen könne, sagte ich ja.",
+      "Seit Caliscas Tod war jeder Schritt von meinem eigenen Atem begleitet gewesen. Nun hörte ich neben mir wieder einen zweiten."
+    ],
+    "decision": {
+      "title": "Worte zuerst, Beistand danach",
+      "choice": "Serin versuchte den Streit vernünftig und diplomatisch zu beenden, verteidigte Aloth aber, als die Angreifer dennoch zu den Waffen griffen, und nahm ihn anschließend in die Gruppe auf.",
+      "consequence": "Aloth wird Serins erster dauerhafter Gefährte. Ihre Haltung wird zugleich als vernünftig und diplomatisch bestätigt.",
+      "analysis": "Serin verwechselt Friedfertigkeit nicht mit Untätigkeit. Sie sucht den Ausweg durch Sprache, akzeptiert aber Verantwortung, sobald andere jede friedliche Tür zuschlagen.",
+      "lesson": "Worte vor Waffen zu wählen bedeutet nicht, die Waffen anderer über sich ergehen zu lassen."
+    }
+  },
+  {
+    "slug": "der-schwarze-hund",
+    "title": "Der schwarze Hund",
+    "type": "Kapitel VII · Versprechen",
+    "date": "19. Majprima, 2823 KI",
+    "machineDate": "2823-05-19",
+    "location": "Die Schänke zum Schwarzen Hund",
+    "summary": "In der Schänke nimmt Serin die Suche nach dem vermissten Koch Tenfrith an. Oben wartet ein zurückgelassener Hund noch immer auf seinen früheren Herrn, bis Serin ihm einen Platz an ihrer Seite anbietet.",
+    "journal": [
+      "Die Schänke bot kalten Haferbrei, ein Bett und die erste geschlossene Tür seit Cilant Lîs. Mehr brauchte ich zunächst nicht.",
+      "Die neue Wirtin erzählte mir von Tenfrith, ihrem Koch. Er war ins Talholz gegangen, um Vorräte zu holen, und seit Tagen nicht zurückgekehrt. Ich versprach, nach ihm zu suchen. Vielleicht, weil ich wusste, wie es ist, auf jemanden zu warten, der nicht wiederkommt.",
+      "Oben saß der Hund, nach dem die Schänke benannt war. Sein früherer Herr war fortgegangen und hatte ihn zurückgelassen. Trotzdem lauschte das Tier noch immer zum Fenster, als könne der richtige Schritt auf der Straße alles wieder in Ordnung bringen.",
+      "Ich sagte ihm die Wahrheit so sanft, wie ich konnte. Dann bot ich ihm an, mit mir zu kommen.",
+      "Er richtete die Ohren auf, lief zu mir und bellte. Es war der einfachste Entschluss dieses Tages und vielleicht der erste, der sich nicht wie ein Verlust anfühlte.",
+      "Aloth, ein vermisster Koch und ein schwarzer Hund. Mein neues Leben ähnelt nicht dem, das ich geplant hatte. Aber zum ersten Mal seit dem Sturm ist darin wieder Platz für andere."
+    ],
+    "decision": {
+      "title": "Für die Zurückgelassenen Platz schaffen",
+      "choice": "Serin übernimmt die Suche nach Tenfrith und nimmt den verlassenen Schwarzen Hund als Begleiter auf.",
+      "consequence": "Die Aufgabe „Verspätung beim Abendessen“ beginnt, und der Schwarze Hund begleitet fortan Serins Gruppe.",
+      "analysis": "Nach zwei Todesfällen, die sie nicht verhindern konnte, entscheidet Serin diesmal dort zu helfen, wo Hilfe unmittelbar möglich ist. Es ist keine große Rettungstat, sondern gelebte Fürsorge.",
+      "lesson": "Ein neues Zuhause beginnt manchmal nicht mit einem Dach, sondern damit, dass jemand sagt: Du kannst mitkommen."
+    }
+  }
+]
