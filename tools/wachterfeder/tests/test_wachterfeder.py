@@ -103,19 +103,22 @@ class WachterfederTests(unittest.TestCase):
 
             original = source.read_bytes()
             copied = wf.copy_read_only(source, root / "workspace")
-            snapshot = wf.inspect_savegame(copied)
+            try:
+                snapshot = wf.inspect_savegame(copied)
 
-            self.assertEqual(source.read_bytes(), original)
-            self.assertEqual(snapshot.archive_format, "zip")
-            self.assertEqual(snapshot.metadata.scene_title, "Talholz")
-            self.assertEqual(snapshot.player.level, 2)
-            self.assertEqual(snapshot.player.experience, 1568)
-            self.assertEqual(snapshot.global_variables["n_Heodan_State"], 5)
-            self.assertEqual(
-                snapshot.marked_conversations[0].marked_node_ids,
-                [0, 2, 5, 7],
-            )
-            self.assertEqual(snapshot.warnings, [])
+                self.assertEqual(source.read_bytes(), original)
+                self.assertEqual(snapshot.archive_format, "zip")
+                self.assertEqual(snapshot.metadata.scene_title, "Talholz")
+                self.assertEqual(snapshot.player.level, 2)
+                self.assertEqual(snapshot.player.experience, 1568)
+                self.assertEqual(snapshot.global_variables["n_Heodan_State"], 5)
+                self.assertEqual(
+                    snapshot.marked_conversations[0].marked_node_ids,
+                    [0, 2, 5, 7],
+                )
+                self.assertEqual(snapshot.warnings, [])
+            finally:
+                copied.chmod(0o666)
 
     def test_writes_machine_readable_snapshot(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
