@@ -1,4 +1,4 @@
-# Wächterfeder verarbeitet urheberrechtlich geschützte Spielressourcen nur lokal.
+# Wächterfeder verarbeitet Spielressourcen nur lokal.
 .wachterfeder/
 *.savegame
 Dialog*.7z
