@@ -104,8 +104,11 @@ class ExpansionAssetTests(unittest.TestCase):
             self.assertEqual(report["unresolved_conversations"], [])
             dialogue = report["conversations"][0]
             self.assertEqual(dialogue["source_package"], "data_expansion2")
-            self.assertEqual(Path(dialogue["source_path"]), expansion_graph)
-            self.assertEqual(Path(dialogue["stringtable_path"]), expansion_strings)
+            self.assertEqual(Path(dialogue["source_path"]).resolve(), expansion_graph.resolve())
+            self.assertEqual(
+                Path(dialogue["stringtable_path"]).resolve(),
+                expansion_strings.resolve(),
+            )
             self.assertEqual(dialogue["marked_nodes"][0]["text"], "Die Weiße Mark")
 
 
