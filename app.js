@@ -114,11 +114,12 @@ function renderProfile(profile) {
 
 async function init() {
   try {
-    const [entries, profile] = await Promise.all([
-      loadJson("./data/entries.json"),
+    const [entrySources, profile] = await Promise.all([
+      loadJson("./data/entry-sources.json"),
       loadJson("./data/serin.json")
     ]);
-    renderEntries(entries);
+    const entryGroups = await Promise.all(entrySources.map(loadJson));
+    renderEntries(entryGroups.flat());
     renderProfile(profile);
   } catch (error) {
     console.error(error);
