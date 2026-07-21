@@ -6,9 +6,16 @@ import tkinter as tk
 from tkinter import font as tkfont, ttk
 
 try:
-    from tools.wachterfeder.gui import WachterfederApp
+    import tools.wachterfeder.gui as gui_module
+    from tools.wachterfeder.expansion_assets import analyse_savegame
 except ModuleNotFoundError:  # Direkter Start aus tools/wachterfeder.
-    from gui import WachterfederApp
+    import gui as gui_module
+    from expansion_assets import analyse_savegame
+
+# Die bestehende Oberfläche greift zur Laufzeit auf dieses Modulattribut zu.
+# So bleibt die UI klein, während die Analyse Grundspiel und Erweiterungen liest.
+gui_module.analyse_savegame = analyse_savegame
+WachterfederApp = gui_module.WachterfederApp
 
 
 class CompatibleWachterfederApp(WachterfederApp):
