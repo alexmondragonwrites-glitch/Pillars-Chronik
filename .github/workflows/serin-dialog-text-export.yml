@@ -1,0 +1,94 @@
+name: Serin dialogue text export
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - Dialog-EN.7z
+      - .github/workflows/serin-dialog-text-export.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install 7-Zip
+        run: sudo apt-get update && sudo apt-get install -y p7zip-full
+
+      - name: Extract English stringtables
+        run: |
+          set -euo pipefail
+          test -f Dialog-EN.7z
+          mkdir -p .dialog-export/all .dialog-export/serin
+          7z t Dialog-EN.7z
+          7z x -y -o.dialog-export/all Dialog-EN.7z >/dev/null
+
+      - name: Select Serin's known conversations
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+          import shutil
+
+          stems = [
+              "07_cv_odema",
+              "07_cv_calisca",
+              "07_bs_caravanner_02",
+              "07_bs_caravanner",
+              "07_cv_heodan",
+              "07_bs_sparfel",
+              "07_bs_calisca_camp_banter",
+              "07_cv_calisca_background",
+              "07_cv_sparfel",
+              "07_cv_ambushers",
+              "07_cv_glanfathan_leader",
+              "07_si_encampment_escape",
+              "07_cv_ruins_banter",
+              "07_cv_starved_xaurip",
+              "07_cv_pillar_puzzle",
+              "07_si_engwithan_relief",
+              "07_si_weak_wall",
+              "07_cv_ruins_finale",
+              "07_cv_ruins_vision",
+              "07_bs_torture",
+          ]
+          source = Path(".dialog-export/all")
+          target = Path(".dialog-export/serin")
+          copied = []
+          missing = []
+          for stem in stems:
+              matches = list(source.rglob(f"{stem}.stringtable"))
+              if len(matches) != 1:
+                  missing.append({"stem": stem, "matches": len(matches)})
+                  continue
+              destination = target / matches[0].name
+              shutil.copy2(matches[0], destination)
+              copied.append(destination.name)
+
+          manifest = {
+              "schema_version": 1,
+              "language": "en",
+              "copied": copied,
+              "missing": missing,
+          }
+          (target / "manifest.json").write_text(
+              json.dumps(manifest, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          if missing:
+              raise SystemExit(f"Missing or ambiguous stringtables: {missing}")
+          print(f"Prepared {len(copied)} stringtables for local analysis.")
+
+      - name: Upload selected stringtables
+        uses: actions/upload-artifact@v4
+        with:
+          name: serin-dialog-stringtables-en
+          path: .dialog-export/serin
+          if-no-files-found: error
+          retention-days: 1
