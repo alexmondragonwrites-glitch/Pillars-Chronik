@@ -2,6 +2,34 @@
 
 Wächterfeder ist die lokale Brücke zwischen einem *Pillars of Eternity*-Spielstand und der Serin-Chronik. Das Werkzeug arbeitet ausschließlich lesend und verändert keinen Originalspielstand.
 
+## Ein-Klick-Oberfläche unter Windows
+
+Nach dem ersten Aktualisieren des Repositorys genügt ein Doppelklick auf:
+
+```text
+Wachterfeder starten.bat
+```
+
+Die kleine Desktop-Oberfläche bietet:
+
+- automatische Auswahl des neuesten Pillars-Spielstands,
+- freie Auswahl einer anderen `.savegame`-Datei,
+- einmalige Auswahl der lokalen Pillars-Installation,
+- einen großen Knopf **„Serin auswerten“**,
+- automatische Erstellung von Snapshot und deutschem Dialogreport,
+- einen lokalen Verlauf unter `.wachterfeder/history/`,
+- direktes Öffnen des Ergebnisordners.
+
+Der bekannte Installationspfad
+
+```text
+E:\SteamLibrary\steamapps\common\Pillars of Eternity
+```
+
+wird automatisch vorgeschlagen, sofern er auf dem Rechner existiert. Die App benötigt keine zusätzlichen Python-Pakete; die Oberfläche verwendet das mit Python gelieferte Tkinter.
+
+Alle Spielstände, Konfigurationen und erzeugten Reports bleiben im ignorierten Ordner `.wachterfeder/` und gelangen nicht ins Repository.
+
 ## Speicherstand finden
 
 Unter Windows liegt der normale Steam-/GOG-Ordner meist hier:
@@ -139,7 +167,7 @@ Der Testsave, vollständige Snapshots, extrahierte Dialogtexte und Spielressourc
 python -m unittest discover -s tools/wachterfeder/tests -v
 ```
 
-Die Tests decken Pfaderkennung, Originalschutz, XML-Metadaten, Charakterwerte, globale Variablen, BitArray-basierte Dialogzustände, Dialoggraphen, lokalisierte Stringtables, lokale Installationspfade sowie sichere und mehrdeutige Pfadkanten ab.
+Die Tests decken Pfaderkennung, Originalschutz, XML-Metadaten, Charakterwerte, globale Variablen, BitArray-basierte Dialogzustände, Dialoggraphen, lokalisierte Stringtables, lokale Installationspfade, die Ein-Klick-Pipeline sowie sichere und mehrdeutige Pfadkanten ab.
 
 ## Nächste Schritte
 
