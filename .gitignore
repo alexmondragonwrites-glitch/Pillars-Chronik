@@ -1,0 +1,9 @@
+# Wächterfeder verarbeitet urheberrechtlich geschützte Spielressourcen nur lokal.
+.wachterfeder/cache/
+.wachterfeder/dialog-index/
+.wachterfeder/game-assets/
+*.savegame
+
+# Python
+__pycache__/
+*.py[cod]
