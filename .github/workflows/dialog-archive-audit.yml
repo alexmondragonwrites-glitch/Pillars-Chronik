@@ -1,0 +1,140 @@
+name: Dialog archive audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - Dialog.7z
+      - .github/workflows/dialog-archive-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install 7-Zip
+        run: sudo apt-get update && sudo apt-get install -y p7zip-full
+
+      - name: Extract archive
+        run: |
+          test -f Dialog.7z
+          mkdir -p .dialog-audit/extracted
+          7z t Dialog.7z
+          7z x -y -o.dialog-audit/extracted Dialog.7z
+
+      - name: Build metadata-only manifest
+        shell: python
+        run: |
+          import collections
+          import hashlib
+          import json
+          from pathlib import Path
+
+          archive = Path("Dialog.7z")
+          root = Path(".dialog-audit/extracted")
+          files = sorted(path for path in root.rglob("*") if path.is_file())
+          relative = [path.relative_to(root).as_posix() for path in files]
+
+          expected = [
+              "07_cv_odema.conversation",
+              "07_cv_calisca.conversation",
+              "07_bs_caravanner_02.conversation",
+              "07_bs_caravanner.conversation",
+              "07_cv_heodan.conversation",
+              "07_bs_sparfel.conversation",
+              "07_bs_calisca_camp_banter.conversation",
+              "07_cv_calisca_background.conversation",
+              "07_cv_sparfel.conversation",
+              "07_cv_ambushers.conversation",
+              "07_cv_glanfathan_leader.conversation",
+              "07_si_encampment_escape.conversation",
+              "07_cv_ruins_banter.conversation",
+              "07_cv_starved_xaurip.conversation",
+              "07_cv_pillar_puzzle.conversation",
+              "07_si_engwithan_relief.conversation",
+              "07_si_weak_wall.conversation",
+              "07_cv_ruins_finale.conversation",
+              "07_cv_ruins_vision.conversation",
+              "07_bs_torture.conversation",
+          ]
+
+          by_name = collections.defaultdict(list)
+          for item in relative:
+              by_name[Path(item).name.casefold()].append(item)
+
+          extensions = collections.Counter(
+              (Path(item).suffix.casefold() or "<none>") for item in relative
+          )
+          top_level = collections.Counter(item.split("/", 1)[0] for item in relative)
+
+          conversations = [item for item in relative if item.casefold().endswith(".conversation")]
+          stringtables = [item for item in relative if item.casefold().endswith(".stringtable")]
+          de_tables = [item for item in stringtables if "/de/" in f"/{item.casefold()}/"]
+          en_tables = [item for item in stringtables if "/en/" in f"/{item.casefold()}/"]
+
+          expected_report = []
+          for conversation_name in expected:
+              string_name = Path(conversation_name).with_suffix(".stringtable").name
+              conversation_paths = by_name.get(conversation_name.casefold(), [])
+              de_paths = [
+                  item for item in by_name.get(string_name.casefold(), [])
+                  if "/de/" in f"/{item.casefold()}/"
+              ]
+              en_paths = [
+                  item for item in by_name.get(string_name.casefold(), [])
+                  if "/en/" in f"/{item.casefold()}/"
+              ]
+              expected_report.append({
+                  "conversation": conversation_name,
+                  "conversation_found": bool(conversation_paths),
+                  "conversation_path_count": len(conversation_paths),
+                  "de_stringtable_found": bool(de_paths),
+                  "en_stringtable_found": bool(en_paths),
+              })
+
+          manifest = {
+              "schema_version": 1,
+              "archive": {
+                  "name": archive.name,
+                  "size_bytes": archive.stat().st_size,
+                  "sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
+              },
+              "file_count": len(files),
+              "extension_counts": dict(sorted(extensions.items())),
+              "top_level_counts": dict(sorted(top_level.items())),
+              "conversation_count": len(conversations),
+              "stringtable_count": len(stringtables),
+              "de_stringtable_count": len(de_tables),
+              "en_stringtable_count": len(en_tables),
+              "serin_save_expected": expected_report,
+              "serin_conversations_matched": sum(
+                  1 for item in expected_report if item["conversation_found"]
+              ),
+              "serin_de_stringtables_matched": sum(
+                  1 for item in expected_report if item["de_stringtable_found"]
+              ),
+              "serin_en_stringtables_matched": sum(
+                  1 for item in expected_report if item["en_stringtable_found"]
+              ),
+          }
+
+          output = Path(".dialog-audit/dialog-archive-manifest.json")
+          output.write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(output.read_text(encoding="utf-8"))
+
+      - name: Upload audit manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: dialog-archive-manifest
+          path: .dialog-audit/dialog-archive-manifest.json
+          if-no-files-found: error
+          retention-days: 3
