@@ -1,0 +1,142 @@
+name: Dialog localization audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "Dialog*.7z"
+      - .github/workflows/dialog-localization-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install 7-Zip
+        run: sudo apt-get update && sudo apt-get install -y p7zip-full
+
+      - name: Extract dialogue archives
+        run: |
+          set -euo pipefail
+          mkdir -p .dialog-audit/extracted
+          shopt -s nullglob
+          archives=(Dialog*.7z)
+          test ${#archives[@]} -gt 0
+          for archive in "${archives[@]}"; do
+            target=".dialog-audit/extracted/${archive%.7z}"
+            mkdir -p "$target"
+            7z t "$archive"
+            7z x -y -o"$target" "$archive"
+          done
+
+      - name: Build metadata-only manifest
+        shell: python
+        run: |
+          import collections
+          import hashlib
+          import json
+          from pathlib import Path
+
+          expected = [
+              "07_cv_odema",
+              "07_cv_calisca",
+              "07_bs_caravanner_02",
+              "07_bs_caravanner",
+              "07_cv_heodan",
+              "07_bs_sparfel",
+              "07_bs_calisca_camp_banter",
+              "07_cv_calisca_background",
+              "07_cv_sparfel",
+              "07_cv_ambushers",
+              "07_cv_glanfathan_leader",
+              "07_si_encampment_escape",
+              "07_cv_ruins_banter",
+              "07_cv_starved_xaurip",
+              "07_cv_pillar_puzzle",
+              "07_si_engwithan_relief",
+              "07_si_weak_wall",
+              "07_cv_ruins_finale",
+              "07_cv_ruins_vision",
+              "07_bs_torture",
+          ]
+
+          root = Path(".dialog-audit/extracted")
+          archive_reports = []
+          aggregate_names = collections.defaultdict(list)
+
+          for archive in sorted(Path(".").glob("Dialog*.7z")):
+              extracted = root / archive.stem
+              files = sorted(path for path in extracted.rglob("*") if path.is_file())
+              relative = [path.relative_to(extracted).as_posix() for path in files]
+              by_name = collections.defaultdict(list)
+              for item in relative:
+                  by_name[Path(item).name.casefold()].append(item)
+                  aggregate_names[Path(item).name.casefold()].append({
+                      "archive": archive.name,
+                      "path": item,
+                  })
+
+              conversations = [item for item in relative if item.casefold().endswith(".conversation")]
+              stringtables = [item for item in relative if item.casefold().endswith(".stringtable")]
+              extensions = collections.Counter(
+                  Path(item).suffix.casefold() or "<none>" for item in relative
+              )
+              matches = []
+              for stem in expected:
+                  matches.append({
+                      "stem": stem,
+                      "conversation_found": bool(by_name.get(f"{stem}.conversation")),
+                      "stringtable_found": bool(by_name.get(f"{stem}.stringtable")),
+                  })
+
+              archive_reports.append({
+                  "name": archive.name,
+                  "size_bytes": archive.stat().st_size,
+                  "sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
+                  "file_count": len(files),
+                  "extension_counts": dict(sorted(extensions.items())),
+                  "conversation_count": len(conversations),
+                  "stringtable_count": len(stringtables),
+                  "serin_conversation_matches": sum(1 for item in matches if item["conversation_found"]),
+                  "serin_stringtable_matches": sum(1 for item in matches if item["stringtable_found"]),
+                  "serin_expected": matches,
+              })
+
+          combined = []
+          for stem in expected:
+              combined.append({
+                  "stem": stem,
+                  "conversation_sources": aggregate_names.get(f"{stem}.conversation", []),
+                  "stringtable_sources": aggregate_names.get(f"{stem}.stringtable", []),
+              })
+
+          manifest = {
+              "schema_version": 1,
+              "archives": archive_reports,
+              "serin_combined": combined,
+              "serin_with_graph_and_text": sum(
+                  1 for item in combined
+                  if item["conversation_sources"] and item["stringtable_sources"]
+              ),
+          }
+
+          output = Path(".dialog-audit/dialog-localization-manifest.json")
+          output.write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(output.read_text(encoding="utf-8"))
+
+      - name: Upload audit manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: dialog-localization-manifest
+          path: .dialog-audit/dialog-localization-manifest.json
+          if-no-files-found: error
+          retention-days: 3
