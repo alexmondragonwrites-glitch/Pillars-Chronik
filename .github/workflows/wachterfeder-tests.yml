@@ -28,5 +28,14 @@ jobs:
       - name: Compile Python sources
         run: python -m compileall tools/wachterfeder
 
-      - name: Run unit tests
-        run: python -m unittest discover -s tools/wachterfeder/tests -v
+      - name: Test save parser
+        run: python -m unittest tools.wachterfeder.tests.test_wachterfeder -v
+
+      - name: Test dialogue parser
+        run: python -m unittest tools.wachterfeder.tests.test_dialogues -v
+
+      - name: Test local game paths
+        run: python -m unittest tools.wachterfeder.tests.test_local_game -v
+
+      - name: Test desktop pipeline
+        run: python -m unittest tools.wachterfeder.tests.test_desktop -v
