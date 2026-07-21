@@ -1,0 +1,5 @@
+.wachterfeder/cache/
+.wachterfeder/dialog-index/
+.wachterfeder/game-assets/
+*.savegame
+Dialog.7z
