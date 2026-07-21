@@ -4,13 +4,13 @@ cd /d "%~dp0"
 
 where pyw >nul 2>nul
 if %errorlevel%==0 (
-  start "Wächterfeder" pyw -3 tools\wachterfeder\gui.py
+  start "Wächterfeder" pyw -3 tools\wachterfeder\gui_compat.py
   exit /b 0
 )
 
 where py >nul 2>nul
 if %errorlevel%==0 (
-  py -3 tools\wachterfeder\gui.py
+  py -3 tools\wachterfeder\gui_compat.py
   exit /b %errorlevel%
 )
 
