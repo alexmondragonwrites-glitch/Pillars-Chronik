@@ -29,14 +29,18 @@ class LocalGameTests(unittest.TestCase):
         strings.mkdir(parents=True)
         return game_root, conversations, strings
 
+    def assertSameResolvedPath(self, actual: Path, expected: Path) -> None:
+        """Compare canonical paths so Windows 8.3 aliases do not break tests."""
+        self.assertEqual(actual.resolve(), expected.resolve())
+
     def test_resolves_from_game_root(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             game_root, conversations, strings = self._make_installation(Path(tmp))
 
             assets = resolve_local_assets(game_root, "de")
 
-            self.assertEqual(assets.conversation_root, conversations.parent)
-            self.assertEqual(assets.stringtable_root, strings.parent)
+            self.assertSameResolvedPath(assets.conversation_root, conversations.parent)
+            self.assertSameResolvedPath(assets.stringtable_root, strings.parent)
 
     def test_resolves_from_localized_conversations_folder(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -44,8 +48,8 @@ class LocalGameTests(unittest.TestCase):
 
             assets = resolve_local_assets(strings.parent, "de")
 
-            self.assertEqual(assets.conversation_root, conversations.parent)
-            self.assertEqual(assets.stringtable_root, strings.parent)
+            self.assertSameResolvedPath(assets.conversation_root, conversations.parent)
+            self.assertSameResolvedPath(assets.stringtable_root, strings.parent)
 
     def test_config_roundtrip_stores_only_path_and_language(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -58,8 +62,8 @@ class LocalGameTests(unittest.TestCase):
             restored = read_local_config(config_path)
             payload = json.loads(config_path.read_text(encoding="utf-8"))
 
-            self.assertEqual(restored.conversation_root, conversations.parent)
-            self.assertEqual(restored.stringtable_root, strings.parent)
+            self.assertSameResolvedPath(restored.conversation_root, conversations.parent)
+            self.assertSameResolvedPath(restored.stringtable_root, strings.parent)
             self.assertEqual(
                 set(payload),
                 {"schema_version", "data_root", "language"},
