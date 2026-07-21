@@ -1,6 +1,6 @@
 # Wächterfeder MVP
 
-Wächterfeder wird die lokale Brücke zwischen einem *Pillars of Eternity*-Spielstand und der Serin-Chronik. Dieser erste Baustein arbeitet ausschließlich lesend.
+Wächterfeder ist die lokale Brücke zwischen einem *Pillars of Eternity*-Spielstand und der Serin-Chronik. Das Werkzeug arbeitet ausschließlich lesend und verändert keinen Originalspielstand.
 
 ## Speicherstand finden
 
@@ -26,7 +26,7 @@ Voraussetzung ist Python 3.10 oder neuer. Aus dem Repository-Stamm:
 python tools/wachterfeder/wachterfeder.py paths
 ```
 
-Einen gefundenen Spielstand inventarisieren:
+Einen Spielstand analysieren:
 
 ```powershell
 python tools/wachterfeder/wachterfeder.py snapshot `
@@ -37,12 +37,32 @@ Das Werkzeug:
 
 - berechnet die SHA-256-Prüfsumme,
 - legt unter `.wachterfeder/cache/` eine schreibgeschützte Arbeitskopie ab,
-- prüft, ob das Save als ZIP geöffnet werden kann,
-- inventarisiert die enthaltenen Dateien,
-- markiert unter anderem `MobileObjects.save`,
-- erzeugt daneben ein JSON-Snapshot.
+- prüft ZIP-Struktur und CRC-Werte,
+- inventarisiert alle enthaltenen Dateien,
+- liest `saveinfo.xml`,
+- extrahiert konservativ Level, Erfahrung, Basisattribute, persistierte Fertigkeiten und Talente,
+- liest globale Integer-Questvariablen,
+- rekonstruiert `ConversationManager.MarkedAsRead`,
+- gibt pro Dialogdatei die im Save markierten Node-IDs aus,
+- erzeugt einen maschinenlesbaren JSON-Snapshot.
 
-Der Originalspielstand wird weder geöffnet zum Schreiben noch ersetzt.
+Die extrahierten Fertigkeitswerte sind persistierte Save-Werte. Angezeigte Endwerte im Spiel können durch Herkunft, Hintergrund, Ausrüstung oder andere Modifikatoren abweichen.
+
+## Validierung mit Serins echtem Save
+
+Der erste reale Testsave wurde am 21. Juli 2026 erfolgreich gelesen:
+
+- Spielerin: Serin Ashwyn
+- Gebiet: Talholz (`AR_0704_Valewood`)
+- Schwierigkeit: Schwer
+- Level: 2
+- Erfahrung: 1568
+- 1937 globale Variablen erkannt
+- 20 Dialogdateien in `MarkedAsRead`
+- 199 markierte Dialogknoten rekonstruiert
+- Talent `TLN_Ancient_Memory` erkannt
+
+Der Testsave selbst und sein vollständiger Snapshot werden nicht ins öffentliche Repository eingecheckt.
 
 ## Tests
 
@@ -50,11 +70,11 @@ Der Originalspielstand wird weder geöffnet zum Schreiben noch ersetzt.
 python -m unittest discover -s tools/wachterfeder/tests -v
 ```
 
+Die Tests decken Pfaderkennung, Originalschutz, XML-Metadaten, Charakterwerte, globale Variablen und die Rekonstruktion eines BitArray-basierten Dialogzustands ab.
+
 ## Nächster Schritt
 
-Sobald ein echter Spielstand vorliegt, prüfen wir:
-
-1. welches Kompressionsverfahren die konkrete Spielversion verwendet,
-2. welche Dateien tatsächlich enthalten sind,
-3. ob `MobileObjects.save` direkt mit dem bekannten SharpSerializer-Ansatz gelesen werden kann,
-4. wo gespielte Dialogknoten, Weltzeit und globale Questvariablen gespeichert werden.
+1. Lokale `.conversation`-Dateien und deutsche/englische `.stringtable`-Dateien indexieren.
+2. Dateiname und Node-ID mit dem tatsächlichen Dialogtext verbinden.
+3. Zwei aufeinanderfolgende Saves vergleichen, um neu gespielte Nodes und geänderte Questvariablen zu isolieren.
+4. Aus diesem Diff eine bestätigungspflichtige Chronik-Vorschau erzeugen.
