@@ -5,14 +5,14 @@ cd /d "%~dp0"
 
 where py >nul 2>&1
 if not errorlevel 1 (
-    py -3 tools\wachterfeder\gui.py
+    py -3 tools\wachterfeder\gui_compat.py
     if errorlevel 1 pause
     exit /b
 )
 
 where python >nul 2>&1
 if not errorlevel 1 (
-    python tools\wachterfeder\gui.py
+    python tools\wachterfeder\gui_compat.py
     if errorlevel 1 pause
     exit /b
 )
