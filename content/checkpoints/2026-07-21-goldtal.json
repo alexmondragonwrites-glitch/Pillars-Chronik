@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "checkpoint_id": "serin-goldtal-2026-07-21",
+  "captured_at": "2026-07-21",
+  "source": {
+    "kind": "wachterfeder-dialog-report",
+    "save_sha256": "0dcf3763f0470357ef2b814b54ab09bfa6251bec134adde6c2148de44437de2d",
+    "previous_save_sha256": "0a78e0d02daa00261137b0d5f07d5c18e0b93de1957e538906b5c301fcac4133",
+    "matched_conversations": 33,
+    "unresolved_conversations": [],
+    "marked_nodes": 364,
+    "localized_nodes": 335,
+    "player_responses": 88,
+    "raw_report_committed": false
+  },
+  "location": {
+    "region": "Goldtal",
+    "narrative_position": "Nach der ersten Rast in der Schänke zum Schwarzen Hund"
+  },
+  "new_conversations": [
+    "07_si_ruined_wall_up.conversation",
+    "07_cv_nonton.conversation",
+    "07_cv_magistrate_urgeat.conversation",
+    "07_bs_gv_event_bells.conversation",
+    "companion_cv_eder.conversation",
+    "companion_cv_eder_intro.conversation",
+    "07_bs_gv_ambients_a.conversation",
+    "07_bs_gv_citizens.conversation",
+    "companion_cv_aloth.conversation",
+    "07_cv_gilded_vale_innkeeper.conversation",
+    "07_cv_galamund.conversation",
+    "07_bs_galamund_onclick.conversation",
+    "07_cv_black_hound.conversation"
+  ],
+  "confirmed_events": [
+    "Serin verließ Cilant Lîs und erreichte Goldtal über das Talholz.",
+    "Sie erzählte Nonton ehrlich vom Angriff auf die Karawane und erfuhr vom Tod seines Freundes Perly.",
+    "Sie sprach mit Magistrat Urgeat über Hohlgeburten, Waidwens Vermächtnis, Fürst Raedric, den stillgelegten Eothas-Tempel und ihre Veränderung nach dem Bîaŵac.",
+    "Drei Totenglocken verkündeten den Verlust von Raedrics Erben.",
+    "Serin begegnete Éder am Galgenbaum, nahm ihn aber noch nicht in die Gruppe auf.",
+    "Sie versuchte den Streit vor der Schänke vernünftig und diplomatisch zu lösen.",
+    "Nach dem unvermeidbaren Kampf nahm sie Aloth in die Gruppe auf.",
+    "Sie rastete in der Schänke zum Schwarzen Hund und übernahm die Suche nach dem vermissten Koch Tenfrith.",
+    "Sie nahm den zurückgelassenen Schwarzen Hund als Begleiter auf."
+  ],
+  "confirmed_disposition_changes": [
+    {
+      "axis": "Honest",
+      "strength": "Minor",
+      "context": "Bericht an Nonton"
+    },
+    {
+      "axis": "Rational",
+      "strength": "Minor",
+      "context": "Eingreifen vor der Schänke"
+    },
+    {
+      "axis": "Diplomatic",
+      "strength": "Minor",
+      "context": "Deeskalationsversuch vor der Schänke"
+    }
+  ],
+  "party_state": {
+    "joined": [
+      "Aloth",
+      "Schwarzer Hund"
+    ],
+    "met_not_joined": [
+      "Éder"
+    ]
+  },
+  "open_threads": [
+    "Die tote Beseelerin am Galgenbaum untersuchen und Serins Erwachen verstehen.",
+    "Den vermissten Koch Tenfrith im Talholz suchen.",
+    "Nontons Bericht über Perly und den Bären prüfen.",
+    "Später erneut mit Éder sprechen.",
+    "Herausfinden, welche Folgen der Tod oder die Hohlgeburt von Raedrics Erben für Goldtal hat."
+  ],
+  "copyright_note": "Das Repository speichert nur abgeleitete Fakten und eigene Chronikprosa. Lokale Spieltexte und der vollständige Dialogreport werden nicht committed."
+}
