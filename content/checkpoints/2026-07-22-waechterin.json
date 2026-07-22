@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "checkpoint_id": "serin-waechterin-2026-07-22",
+  "captured_at": "2026-07-22",
+  "source": {
+    "kind": "wachterfeder-dialog-report",
+    "save_sha256": "bd96de2fbcd40568a38b0de933304ec2e04825b1f1ea8ac14235f9894c94a398",
+    "previous_save_sha256": "0dcf3763f0470357ef2b814b54ab09bfa6251bec134adde6c2148de44437de2d",
+    "matched_conversations": 41,
+    "unresolved_conversations": [],
+    "marked_nodes": 510,
+    "localized_nodes": 472,
+    "player_responses": 131,
+    "raw_report_committed": false
+  },
+  "delta_from_previous_checkpoint": {
+    "new_conversations": 8,
+    "additional_marked_nodes": 146,
+    "additional_localized_nodes": 137,
+    "additional_player_responses": 43
+  },
+  "location": {
+    "region": "Goldtal",
+    "narrative_position": "Nach Caldaras Offenbarung und Aloths Reaktion"
+  },
+  "new_conversations": [
+    "07_bs_villagers_misc_barks_b.conversation",
+    "07_cv_tuatanu.conversation",
+    "cv_watcher_backer_story.conversation",
+    "07_cv_smithy_guard.conversation",
+    "07_bs_smith_customer.conversation",
+    "07_si_caldara_dream.conversation",
+    "07_cv_caldara.conversation",
+    "companion_cv_watcher_reaction.conversation"
+  ],
+  "confirmed_events": [
+    "Serin sprach im Schwarzen Hammer mit Tuatanu über eine verschwundene Eisenlieferung und ihre Arbeiter.",
+    "Sie übernahm die Suche nach dem Wagen und versprach, die Arbeiter heil zurückzubringen.",
+    "Während der Rast träumte sie von Caldara am Galgenbaum und hörte die Bezeichnung Wächter.",
+    "Serin berührte Caldaras Seele und führte ein ausführliches Gespräch mit der hingerichteten Beseelerin.",
+    "Caldara erklärte Serin, dass sie seit Cilant Lîs eine Wächterin ist und Seelen sowie Erinnerungen vergangener Leben wahrnehmen kann.",
+    "Caldara nannte Maerwald in Caed Nua als möglichen Lehrer und Ansprechpartner.",
+    "Die Aufgabe um den alten Wächter begann und Caed Nua wurde als Ziel erschlossen.",
+    "Serin erzählte Aloth offen, dass sie eine Wächterin ist.",
+    "Aloth würdigte ihre Aufrichtigkeit und teilte sein begrenztes Wissen über Wächter."
+  ],
+  "confirmed_disposition_changes": [
+    {
+      "axis": "Benevolent",
+      "strength": "Minor",
+      "context": "Versprechen, Tuatanus Arbeiter heil zurückzubringen"
+    }
+  ],
+  "quest_state": {
+    "started": [
+      "Die verschwundene Schmiedelieferung",
+      "Der alte Wächter"
+    ],
+    "completed": [
+      "Die Erkenntnis, eine Wächterin zu sein"
+    ]
+  },
+  "party_state": {
+    "confirmed_present": [
+      "Aloth"
+    ],
+    "carried_forward_from_previous_checkpoint": [
+      "Schwarzer Hund"
+    ],
+    "met_not_joined": [
+      "Éder"
+    ]
+  },
+  "character_state": {
+    "new_identity": "Wächterin",
+    "known_by": [
+      "Serin",
+      "Aloth"
+    ],
+    "new_lead": "Maerwald in Caed Nua"
+  },
+  "open_threads": [
+    "Maerwald in Caed Nua aufsuchen und Serins Wächterfähigkeiten verstehen.",
+    "Tuatanus verschwundene Eisenlieferung und seine Arbeiter in oder jenseits der Schwarzauen finden.",
+    "Den vermissten Koch Tenfrith im Talholz suchen.",
+    "Nontons Bericht über Perly und den Bären prüfen.",
+    "Später erneut mit Éder sprechen.",
+    "Die Folgen von Raedrics Hohlgeburten und Caldaras Hinrichtung weiter untersuchen."
+  ],
+  "copyright_note": "Das Repository speichert nur abgeleitete Fakten und eigene Chronikprosa. Lokale Spieltexte und der vollständige Dialogreport werden nicht committed."
+}
