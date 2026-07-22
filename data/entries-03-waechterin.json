@@ -1,0 +1,100 @@
+[
+  {
+    "slug": "das-eisen-das-nicht-ankam",
+    "title": "Das Eisen, das nicht ankam",
+    "type": "Kapitel VIII · Versprechen",
+    "date": "Nach Serins erster Nacht in Goldtal",
+    "machineDate": "2823-05-19",
+    "location": "Der Schwarze Hammer, Goldtal",
+    "summary": "Beim Schmied Tuatanu erfährt Serin, dass ein Wagen mit Eisen und Arbeitern auf dem Rückweg durch die Schwarzauen verschwunden ist. Sie verspricht, nicht nur die Vorräte, sondern auch die Menschen heil zurückzubringen.",
+    "journal": [
+      "Der Schwarze Hammer war einer der wenigen Orte in Goldtal, an denen noch etwas hergestellt wurde, statt nur auf seinen Verfall zu warten. Tuatanu begrüßte mich freundlich, doch seine Regale waren beinahe leer.",
+      "Ein Wagen mit Eisen und Arbeitern war seit einer Woche überfällig. Tuatanu vermutete Banditen auf der Straße nach Osten. Vielleicht, sagte er, hätten seine Leute die Ladung selbst verkauft. Er klang, als wolle er diese Möglichkeit lieber verspotten als fürchten.",
+      "Ich fragte nach der Route. Neu-Heomar, Stammheim, dann durch die Schwarzauen und die Wildnis im Norden.",
+      "Er bat mich, nach der Lieferung Ausschau zu halten. Ich versprach ihm, seine Leute heil und gesund zurückzubringen.",
+      "Sein Auftrag galt dem Eisen. Mein Versprechen galt den Menschen."
+    ],
+    "decision": {
+      "title": "Die Arbeiter nicht zur Fußnote der Lieferung machen",
+      "choice": "Serin übernimmt die Suche nach Tuatanus verschwundenem Wagen und verspricht ausdrücklich, auch seine Arbeiter sicher zurückzubringen.",
+      "consequence": "Die Aufgabe um die verschwundene Schmiedelieferung beginnt; Serins wohlwollende Haltung wird weiter gefestigt.",
+      "analysis": "Serin hört in einer wirtschaftlichen Notlage zuerst die menschliche. Für Goldtal ist das Eisen wichtig, doch für sie darf eine Ladung nicht mehr Gewicht besitzen als die Menschen, die sie transportieren.",
+      "lesson": "Ein Auftrag fragt oft nach Dingen. Verantwortung fragt nach den Menschen, die an ihnen hängen."
+    }
+  },
+  {
+    "slug": "der-traum-unter-leeren-zweigen",
+    "title": "Der Traum unter leeren Zweigen",
+    "type": "Kapitel IX · Traum",
+    "date": "Nach Serins erster Nacht in Goldtal",
+    "machineDate": "2823-05-19",
+    "location": "Die Schänke und der Galgenbaum von Goldtal",
+    "summary": "Im Schlaf kehrt Serin zum Galgenbaum zurück. Die tote Zwergin Caldara öffnet ihre leeren Augen und gibt dem, was Serin geworden ist, einen Namen.",
+    "journal": [
+      "Der Schlaf brachte keine Ruhe. Das Knarren der Galgenstricke drang durch meinen Traum, bis es lauter war als jeder Gedanke.",
+      "Ich stand wieder unter dem blattlosen Baum. Die alte Zwergin hing dort, das Gesicht vom Tod eingefallen. Je länger ich sie ansah, desto näher rückte sie, bis zwischen uns kaum noch Luft blieb.",
+      "Dann hob sie den Kopf.",
+      "Hinter ihren geöffneten Augen war keine Finsternis, sondern eine Leere, die größer wirkte als der Himmel über Goldtal.",
+      "Aus ihrem Mund kam nur ein einziges Wort: Wächter.",
+      "Ich erwachte im Schweiß, doch der Geruch des Galgenbaums blieb. Noch stärker blieb der Drang, zu der Toten zurückzukehren und herauszufinden, weshalb sie mich gerufen hatte."
+    ],
+    "decision": {
+      "title": "Dem Traum folgen",
+      "choice": "Serin verdrängt den Albtraum nicht, sondern kehrt gedanklich und schließlich körperlich zu Caldara am Galgenbaum zurück.",
+      "consequence": "Die nächste Spur zu ihrem Erwachen führt nicht zu einem lebenden Heiler, sondern zu einer hingerichteten Beseelerin.",
+      "analysis": "Serins Wissensdrang ist stärker als ihr Ekel und ihre Angst. Sie behandelt den Traum nicht als bloße Störung, sondern als Botschaft, deren Bedeutung geprüft werden muss.",
+      "lesson": "Manche Fragen klopfen nicht an die Tür. Sie warten im Schlaf, bis man ihnen folgt."
+    }
+  },
+  {
+    "slug": "die-tote-die-antwortete",
+    "title": "Die Tote, die antwortete",
+    "type": "Kapitel X · Wächterin",
+    "date": "Nach Serins erster Nacht in Goldtal",
+    "machineDate": "2823-05-19",
+    "location": "Der Galgenbaum von Goldtal",
+    "summary": "Serin berührt Caldaras Seele und erfährt, dass sie seit Cilant Lîs eine Wächterin ist. Die tote Beseelerin weist ihr den Weg zu Maerwald in Caed Nua.",
+    "journal": [
+      "Ich streckte mich nach Caldara aus, nicht mit der Hand allein, sondern mit etwas in mir, das erst seit Cilant Lîs wach war.",
+      "Die Welt ruckte zur Seite. Der Wind verstummte, der Baum stand in einer nebligen Leere, und die Tote sah mich an.",
+      "Caldara erklärte mir, dass ich hinter den Schleier geblickt hatte. Meine Seele erkenne nun andere Seelen, ihre Erinnerungen und manchmal sogar die Leben, die vor ihrem jetzigen Körper lagen.",
+      "Sie nannte mich eine Wächterin. Nicht für einen Augenblick, sondern von nun an.",
+      "Vielleicht, sagte sie, habe ich den Bîaŵac überlebt, weil meine Seele ungewöhnlich stark und über viele Leben hinweg ganz geblieben sei. Doch sie warnte auch vor schlaflosen Nächten und davor, dass diese Gabe für manche zu viel werde.",
+      "Caldara selbst war eine Beseelerin gewesen. Sie hatte Fürst Raedrics Gemahlin untersucht und keine Krankheit gefunden, obwohl der Fürst Antworten verlangte. Ihre letzte Antwort hing nun über mir am Galgenbaum.",
+      "Bevor sie wieder verstummte, nannte sie mir einen Namen: Maerwald. Einen anderen Wächter, zurückgezogen in der verlassenen Burg Caed Nua jenseits der Schwarzauen.",
+      "Zum ersten Mal seit dem Sturm hatte das Flüstern einen Namen. Und einen Weg."
+    ],
+    "decision": {
+      "title": "Die neue Wahrnehmung annehmen und prüfen",
+      "choice": "Serin stellt Caldara ausführliche Fragen über Wächter, Seelen, Beseelung und den Bîaŵac und nimmt die Spur zu Maerwald auf.",
+      "consequence": "Serin erkennt sich als Wächterin; die Suche nach Maerwald und Caed Nua beginnt.",
+      "analysis": "Die Offenbarung verändert Serins Ziel. Sie sucht nicht mehr nur Heilung von einem fremden Leiden, sondern Verständnis für eine dauerhafte Fähigkeit. Aus der Lehrerin wird keine andere Person, doch ihr Unterrichtsgegenstand ist nun die Seele selbst.",
+      "lesson": "Ein Name heilt nichts. Aber er verwandelt namenlose Angst in eine Frage, der man folgen kann."
+    }
+  },
+  {
+    "slug": "die-wahrheit-zwischen-gefaehrten",
+    "title": "Die Wahrheit zwischen Gefährten",
+    "type": "Kapitel XI · Vertrauen",
+    "date": "Nach der Begegnung mit Caldara",
+    "machineDate": "2823-05-19",
+    "location": "Goldtal",
+    "summary": "Aloth bemerkt Serins Versinken in Caldaras Seele. Statt eine Ausrede zu erfinden, erzählt Serin ihm, dass sie eine Wächterin ist.",
+    "journal": [
+      "Als die Welt um mich zurückkehrte, stand Aloth noch neben mir. Für ihn waren nur Augenblicke vergangen. Für mich hatte eine Tote über mehrere Leben gesprochen.",
+      "Er fragte, ob es mir gut gehe und weshalb ich so verloren gewirkt hatte.",
+      "Ich hätte vom Fieber sprechen können. Vom Bîaŵac. Von Erschöpfung.",
+      "Stattdessen sagte ich ihm die Wahrheit: Ich bin eine Wächterin.",
+      "Aloth reagierte mit Neugier, nicht mit Abscheu. Er wusste wenig über Wächter, nur dass sie selten seien und besondere Einsichten in die Zustände von Seelen hätten.",
+      "Er dankte mir für meine Offenheit. Wenn wir gemeinsam reisen, sagte er, sei es klug, solche Dinge miteinander zu teilen.",
+      "Vielleicht beginnt Vertrauen nicht damit, dass jemand alles versteht. Vielleicht beginnt es damit, dass man ihm die Wahrheit zumutet."
+    ],
+    "decision": {
+      "title": "Aloth einweihen",
+      "choice": "Serin erzählt Aloth offen von ihrer neuen Identität als Wächterin und fragt, was er darüber weiß.",
+      "consequence": "Aloth kennt nun Serins Geheimnis und würdigt ihre Aufrichtigkeit; zwischen den beiden entsteht ein erster belastbarer Vertrauensfaden.",
+      "analysis": "Serin schützt sich nicht durch Verschweigen. Nach dem Verlust ihrer ersten Begleiter entscheidet sie, dass eine neue Gemeinschaft nur Bestand haben kann, wenn sie nicht auf Ausflüchten gebaut wird.",
+      "lesson": "Vertrauen verlangt nicht, dass jemand die Antwort kennt. Es verlangt, dass man ihm die Frage zeigt."
+    }
+  }
+]
