@@ -1,0 +1,25 @@
+[
+  {
+    "slug": "der-mann-unter-dem-galgenbaum",
+    "title": "Der Mann unter dem Galgenbaum",
+    "type": "Kapitel XII · Gefährte",
+    "date": "Nach der Begegnung mit Caldara",
+    "machineDate": "2823-05-19",
+    "location": "Der Galgenbaum von Goldtal",
+    "summary": "Unter Goldtals Gehängten begegnet Serin Éder erneut. Sein trockener Humor verbirgt Fragen über Eothas, den Krieg und seinen hingerichteten Hauptmann. Serin lädt ihn ein, sie nach Caed Nua zu begleiten.",
+    "journal": [
+      "Nach dem Gespräch mit Caldara blieb ich noch unter dem Galgenbaum. Dort stand Éder mit seiner Pfeife und zählte die Toten, als wäre schwarzer Humor das Einzige, was Goldtal ihm noch nicht hatte nehmen können.",
+      "Ich antwortete ihm im gleichen Ton. Danach erzählte er von Eothas, vom Krieg des Heiligen und von Swithin, seinem früheren Hauptmann und Vorarbeiter, der nun über uns am Baum hing.",
+      "Éder wusste, dass Goldtal auch ihn verdächtigte. Er wollte fort, hatte aber noch kein Ziel. Ich erzählte ihm von Maerwald und Caed Nua.",
+      "Etwas in ihm wurde wach. Auch er trug Fragen mit sich, die sich vielleicht nur an einen Wächter richten ließen.",
+      "Ich bot ihm an, mit uns zu reisen. Er nahm an. Aus zwei Gefährten und einem Hund wurde eine kleine Gruppe, und Caed Nua wurde zu einem Ziel für mehr als nur meine eigenen Antworten."
+    ],
+    "decision": {
+      "title": "Einen Ausgestoßenen nicht zurücklassen",
+      "choice": "Serin lädt Éder ein, sie gemeinsam mit Aloth nach Caed Nua zu begleiten.",
+      "consequence": "Éder tritt der Gruppe noch vor Maerwald bei, und seine persönliche Suche beginnt.",
+      "analysis": "Serin sammelt keine Gefährten aus Zweckmäßigkeit allein. Sie erkennt in Éder jemanden, den Goldtal bereits zum nächsten Schuldigen erklärt hat, und bietet ihm statt eines Urteils einen Weg an.",
+      "lesson": "Manchmal entsteht Gemeinschaft dort, wo mehrere Menschen denselben Ort verlassen müssen, aber nicht mehr allein gehen wollen."
+    }
+  }
+]
