@@ -1,9 +1,9 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "checkpoint_id": "serin-waechterin-2026-07-22",
   "captured_at": "2026-07-22",
   "source": {
-    "kind": "wachterfeder-dialog-report",
+    "kind": "wachterfeder-dialog-report+save-snapshot",
     "save_sha256": "bd96de2fbcd40568a38b0de933304ec2e04825b1f1ea8ac14235f9894c94a398",
     "previous_save_sha256": "0dcf3763f0470357ef2b814b54ab09bfa6251bec134adde6c2148de44437de2d",
     "matched_conversations": 41,
@@ -11,17 +11,56 @@
     "marked_nodes": 510,
     "localized_nodes": 472,
     "player_responses": 131,
-    "raw_report_committed": false
+    "snapshot_global_variables": 1937,
+    "raw_report_committed": false,
+    "raw_snapshot_committed": false
   },
   "delta_from_previous_checkpoint": {
     "new_conversations": 8,
     "additional_marked_nodes": 146,
     "additional_localized_nodes": 137,
-    "additional_player_responses": 43
+    "additional_player_responses": 43,
+    "note": "Nicht nur neue Dialogdateien, sondern auch neue Knoten in bereits bekannten Gesprächen müssen künftig ausgewertet werden. Éders Beitritt lag in einer schon zuvor bekannten Gesprächsdatei."
   },
   "location": {
     "region": "Goldtal",
-    "narrative_position": "Nach Caldaras Offenbarung und Aloths Reaktion"
+    "map_name": "AR_0705_Gilded_Vale",
+    "narrative_position": "Nach Caldaras Offenbarung, Aloths Reaktion und Éders Beitritt"
+  },
+  "save_metadata": {
+    "difficulty": "Hard",
+    "tactical_mode": "RoundBased",
+    "chapter": 1,
+    "active_packages": [
+      "BaseGame",
+      "Expansion1",
+      "Expansion2"
+    ],
+    "realtime_play_duration_seconds": 8799,
+    "playtime_seconds": 191002
+  },
+  "character_progression": {
+    "name": "Serin Ashwyn",
+    "level": 3,
+    "experience": 3187,
+    "base_attributes": {
+      "might": 14,
+      "constitution": 8,
+      "dexterity": 10,
+      "perception": 16,
+      "intellect": 17,
+      "resolve": 10
+    },
+    "persisted_skills": {
+      "athletics": 3,
+      "lore": 6,
+      "mechanics": 3,
+      "survival": 0,
+      "stealth": 0
+    },
+    "serialized_talents": [
+      "TLN_Ancient_Memory"
+    ]
   },
   "new_conversations": [
     "07_bs_villagers_misc_barks_b.conversation",
@@ -42,34 +81,44 @@
     "Caldara nannte Maerwald in Caed Nua als möglichen Lehrer und Ansprechpartner.",
     "Die Aufgabe um den alten Wächter begann und Caed Nua wurde als Ziel erschlossen.",
     "Serin erzählte Aloth offen, dass sie eine Wächterin ist.",
-    "Aloth würdigte ihre Aufrichtigkeit und teilte sein begrenztes Wissen über Wächter."
+    "Aloth würdigte ihre Aufrichtigkeit und teilte sein begrenztes Wissen über Wächter.",
+    "Serin sprach unter dem Galgenbaum mit Éder über Eothas, den Krieg des Heiligen und seinen hingerichteten Hauptmann Swithin.",
+    "Serin lud Éder ein, sie nach Caed Nua zu begleiten.",
+    "Éder trat der Gruppe noch vor der Begegnung mit Maerwald bei und seine persönliche Aufgabe begann."
   ],
   "confirmed_disposition_changes": [
     {
       "axis": "Benevolent",
       "strength": "Minor",
       "context": "Versprechen, Tuatanus Arbeiter heil zurückzubringen"
+    },
+    {
+      "axis": "Clever",
+      "strength": "Minor",
+      "context": "Schlagfertige Antwort in Éders erstem ausführlichen Gespräch"
     }
   ],
   "quest_state": {
     "started": [
       "Die verschwundene Schmiedelieferung",
-      "Der alte Wächter"
+      "Der alte Wächter",
+      "Éders persönliche Suche"
     ],
     "completed": [
       "Die Erkenntnis, eine Wächterin zu sein"
     ]
   },
   "party_state": {
-    "confirmed_present": [
-      "Aloth"
-    ],
-    "carried_forward_from_previous_checkpoint": [
-      "Schwarzer Hund"
-    ],
-    "met_not_joined": [
+    "confirmed_companions": [
+      "Aloth",
       "Éder"
-    ]
+    ],
+    "confirmed_pet": "Schwarzer Hund",
+    "recruitment_flags": {
+      "aloth_joined": true,
+      "eder_joined_pre_maerwald": true,
+      "black_hound_acquired": true
+    }
   },
   "character_state": {
     "new_identity": "Wächterin",
@@ -84,8 +133,8 @@
     "Tuatanus verschwundene Eisenlieferung und seine Arbeiter in oder jenseits der Schwarzauen finden.",
     "Den vermissten Koch Tenfrith im Talholz suchen.",
     "Nontons Bericht über Perly und den Bären prüfen.",
-    "Später erneut mit Éder sprechen.",
+    "Éders Fragen zu Eothas, Swithin und seiner Vergangenheit weiterverfolgen.",
     "Die Folgen von Raedrics Hohlgeburten und Caldaras Hinrichtung weiter untersuchen."
   ],
-  "copyright_note": "Das Repository speichert nur abgeleitete Fakten und eigene Chronikprosa. Lokale Spieltexte und der vollständige Dialogreport werden nicht committed."
+  "copyright_note": "Das Repository speichert nur abgeleitete Fakten und eigene Chronikprosa. Lokale Spieltexte, der vollständige Dialogreport und der Save-Snapshot werden nicht committed."
 }
