@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "checkpoint_id": "serin-aufras-bitte-2026-07-23",
+  "captured_at": "2026-07-23",
+  "source": {
+    "kind": "wachterfeder-dialog-report+save-snapshot",
+    "save_sha256": "d816297b98a62bf138cdac1a83ac121883e42b273a45eae6fbf4bdd8a358739f",
+    "previous_save_sha256": "bd96de2fbcd40568a38b0de933304ec2e04825b1f1ea8ac14235f9894c94a398",
+    "matched_conversations": 43,
+    "unresolved_conversations": [],
+    "marked_nodes": 552,
+    "localized_nodes": 517,
+    "player_responses": 144,
+    "snapshot_global_variables": 1937,
+    "raw_report_committed": false,
+    "raw_snapshot_committed": false
+  },
+  "delta_from_previous_checkpoint": {
+    "new_conversations": 2,
+    "additional_marked_nodes": 42,
+    "additional_localized_nodes": 45,
+    "additional_player_responses": 13,
+    "additional_nodes_in_known_conversations": 1,
+    "note": "Die beiden neuen Gesprächsdateien erklären 41 der 42 zusätzlichen markierten Knoten. Ein weiterer Knoten stammt aus einem bereits bekannten Gespräch und bildet kein eigenständiges, sicher bestätigtes Chronikereignis."
+  },
+  "location": {
+    "region": "Goldtal",
+    "map_name": "AR_0705_Gilded_Vale",
+    "narrative_position": "Nach Aufras Bitte und dem Gespräch mit Nonton und Ingroed"
+  },
+  "save_metadata": {
+    "difficulty": "Hard",
+    "tactical_mode": "RoundBased",
+    "chapter": 1,
+    "active_packages": [
+      "BaseGame",
+      "Expansion1",
+      "Expansion2"
+    ],
+    "realtime_play_duration_seconds": 9012,
+    "playtime_seconds": 194517,
+    "real_timestamp": "07/23/2026 05:40:55"
+  },
+  "character_progression": {
+    "name": "Serin Ashwyn",
+    "level": 3,
+    "experience": 3213,
+    "base_attributes": {
+      "might": 14,
+      "constitution": 8,
+      "dexterity": 10,
+      "perception": 16,
+      "intellect": 17,
+      "resolve": 10
+    },
+    "persisted_skill_values": {
+      "athletics": 3,
+      "lore": 6,
+      "mechanics": 3,
+      "survival": 0,
+      "stealth": 0
+    },
+    "serialized_talents": [
+      "TLN_Ancient_Memory"
+    ]
+  },
+  "new_conversations": [
+    "07_cv_aufra.conversation",
+    "07_cv_ingroed.conversation"
+  ],
+  "confirmed_events": [
+    "Serin stellte sich Aufra vor und berichtete ihr wahrheitsgemäß vom Untergang der Karawane und Caliscas Tod.",
+    "Aufra erklärte, dass sie Calisca wegen ihrer Schwangerschaft und der Hohlgeburten nach Goldtal gerufen hatte.",
+    "Serin übernahm die Suche nach der Hebamme Ranga in Anslogs Kompass.",
+    "Aufra gab Serin 20 Münzen für Rangas Hilfe.",
+    "Serin fragte Aufra nach Goldtal und erfuhr mehr über das Dorf, Raedrics Herrschaft und die Angst vor dem Vermächtnis.",
+    "Serin traf Nonton bei Ingroed, während beide für eine Reise nach Trutzbucht packten.",
+    "Serin sprach ihre auffällig gute Stimmung nach dem jüngsten Verlust an.",
+    "Nontons Bericht über Perly blieb ungeklärt; Serin erhob noch keine Anschuldigung."
+  ],
+  "reputation_changes": [
+    {
+      "faction": "GildedVale",
+      "axis": "Positive",
+      "strength": "VeryMinor",
+      "context": "Übernahme von Aufras Bitte"
+    }
+  ],
+  "quest_state": {
+    "started": [
+      "Aufras Bitte: Ranga in Anslogs Kompass finden"
+    ],
+    "active_flags": {
+      "n_mothers_plea_main": 1,
+      "n_Aufra_Status": 3,
+      "n_smith_shipment_main": 1
+    },
+    "unresolved_evidence": {
+      "n_Nonton_State": 1,
+      "n_Nonton_Quest_Stage": 0,
+      "b_found_perly": 0,
+      "b_gv_bear": 0
+    }
+  },
+  "party_state": {
+    "confirmed_companions": [
+      "Aloth",
+      "Éder"
+    ],
+    "confirmed_pet": "Schwarzer Hund",
+    "recruitment_flags": {
+      "aloth_joined": true,
+      "eder_joined_pre_maerwald": true,
+      "black_hound_acquired": true
+    }
+  },
+  "character_state": {
+    "identity": "Wächterin",
+    "new_responsibility": "Ranga für Aufra und ihr ungeborenes Kind finden",
+    "open_suspicion": "Nontons Bericht über Perly und den Bären"
+  },
+  "open_threads": [
+    "Ranga in Anslogs Kompass finden und Aufra Hilfe für ihr ungeborenes Kind bringen.",
+    "Perlys Schicksal und Nontons widersprüchlichen Bericht im Talholz überprüfen.",
+    "Maerwald in Caed Nua aufsuchen und Serins Wächterfähigkeiten verstehen.",
+    "Tuatanus verschwundene Eisenlieferung und seine Arbeiter finden.",
+    "Den vermissten Koch Tenfrith im Talholz suchen.",
+    "Éders Fragen zu Eothas, Swithin und seiner Vergangenheit weiterverfolgen.",
+    "Die Folgen von Raedrics Hohlgeburten und Caldaras Hinrichtung weiter untersuchen."
+  ],
+  "copyright_note": "Das Repository speichert nur abgeleitete Fakten und eigene Chronikprosa. Lokale Spieltexte, der vollständige Dialogreport und der Save-Snapshot werden nicht committed."
+}
