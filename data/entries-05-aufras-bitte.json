@@ -1,0 +1,48 @@
+[
+  {
+    "slug": "die-schwester-am-herd",
+    "title": "Die Schwester am Herd",
+    "type": "Kapitel XIII · Bitte",
+    "date": "Nach Éders Beitritt",
+    "machineDate": "2823-05-19",
+    "location": "Aufras Haus, Goldtal",
+    "summary": "In einem stillen Haus trifft Serin auf Aufra, Caliscas schwangere Schwester. Sie überbringt die Nachricht vom Tod der Karawane und übernimmt Aufras Bitte, die Hebamme Ranga in Anslogs Kompass zu finden.",
+    "journal": [
+      "In einem Haus nahe Goldtals Galgenbaum stand eine schwangere Frau am Herd und summte für ihr ungeborenes Kind. Sie hieß Aufra.",
+      "Als sie nach Meister Odemas Karawane fragte, sagte ich ihr die Wahrheit. Die anderen waren tot. Calisca ebenfalls.",
+      "Aufra weinte nicht nur um ihre Schwester. Sie gab sich die Schuld, weil sie Calisca nach Goldtal gerufen hatte. Das Vermächtnis und Raedrics Verbannung der Mütter hohlgeborener Kinder hatten ihr jede Sicherheit genommen.",
+      "Sie erzählte von Ranga, einer alten Hebamme in Anslogs Kompass, die vielleicht einen Weg kennt, ihr Kind zu schützen. Calisca sollte die Reise für sie übernehmen.",
+      "Nun werde ich gehen. Aufra gab mir Münzen für Rangas Hilfe. Caliscas Weg endete vor Goldtal, doch ihre Absicht muss dort nicht enden."
+    ],
+    "decision": {
+      "title": "Caliscas letzte Absicht weitertragen",
+      "choice": "Serin berichtet Aufra ehrlich vom Tod ihrer Schwester und verspricht, Ranga in Anslogs Kompass aufzusuchen.",
+      "consequence": "Aufras Auftrag beginnt. Serin erhält Geld für Rangas Hilfe und gewinnt ein wenig Ansehen in Goldtal.",
+      "analysis": "Serin beschönigt den Verlust nicht, lässt Aufra damit aber auch nicht allein. Sie verwandelt Caliscas unerfüllte Hilfe in eine konkrete Verantwortung, ohne ein Ergebnis zu versprechen, das sie noch nicht kennen kann.",
+      "lesson": "Ein Versprechen kann den Tod nicht zurücknehmen. Es kann aber verhindern, dass mit einem Menschen auch seine letzte gute Absicht verschwindet."
+    }
+  },
+  {
+    "slug": "gepackte-taschen",
+    "title": "Gepackte Taschen",
+    "type": "Kapitel XIV · Verdacht",
+    "date": "Noch am selben Tag",
+    "machineDate": "2823-05-19",
+    "location": "Ingroeds Haus, Goldtal",
+    "summary": "Serin trifft Nonton bei Ingroed. Beide packen für eine Reise nach Trutzbucht und wirken erleichterter, als ihre jüngsten Verluste erwarten ließen. Serin spricht den Widerspruch an, urteilt aber noch nicht.",
+    "journal": [
+      "Nonton traf ich nicht im Talholz wieder, sondern in Ingroeds Haus. Zwischen ihnen lagen prall gefüllte Taschen, bereit für eine schnelle Abreise.",
+      "Als Ingroed fragte, ob er mich kenne, erinnerte Nonton sich nur stockend an unsere Begegnung und an seine Warnung vor dem Bären.",
+      "Sie erklärten, nach Trutzbucht reisen zu wollen. Ingroed sagte offen, dass sie Goldtal satt habe. Nonton nannte es Zeit für eine neue Umgebung.",
+      "Ihre Erleichterung passte nicht zu dem Verlust, von dem Nonton gesprochen hatte. Ich sagte es ihnen. Ingroed antwortete, sie trauere auf ihre eigene Weise und sei nur froh, diesen Ort endlich verlassen zu können.",
+      "Das ist kein Beweis. Aber Nontons Geschichte besitzt nun eine lose Naht, und gepackte Taschen können ebenso gut Flucht wie Aufbruch bedeuten."
+    ],
+    "decision": {
+      "title": "Den Widerspruch benennen, ohne ein Urteil vorwegzunehmen",
+      "choice": "Serin spricht Nonton und Ingroed auf ihre auffällig gute Stimmung und die hastige Abreise an, erhebt aber noch keine Anschuldigung.",
+      "consequence": "Nontons Bericht über Perly und den Bären bleibt ungeklärt. Die geplante Abreise nach Trutzbucht wird zu einem weiteren Hinweis.",
+      "analysis": "Serins Skepsis richtet sich nicht gegen Menschen, sondern gegen unstimmige Erzählungen. Sie hält den Verdacht fest, ohne aus Unbehagen bereits Schuld zu formen.",
+      "lesson": "Ein Widerspruch ist noch kein Beweis. Aber er ist ein Grund, genauer hinzusehen."
+    }
+  }
+]
