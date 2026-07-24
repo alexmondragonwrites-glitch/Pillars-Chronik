@@ -1,0 +1,61 @@
+name: Wächterfeder tests
+
+on:
+  pull_request:
+    branches: [main, agent/wachterfeder-mvp]
+    paths:
+      - "Wachterfeder starten.bat"
+      - "tools/wachterfeder/**"
+      - ".github/workflows/wachterfeder-tests.yml"
+      - ".gitignore"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile Python sources
+        run: python -m compileall tools/wachterfeder
+
+      - name: Test save parser
+        run: python -m unittest tools.wachterfeder.tests.test_wachterfeder -v
+
+      - name: Test dialogue parser
+        run: python -m unittest tools.wachterfeder.tests.test_dialogues -v
+
+      - name: Test local game paths
+        shell: pwsh
+        run: |
+          python -m unittest tools.wachterfeder.tests.test_local_game -v *> local-game-test.log
+          $code = $LASTEXITCODE
+          Get-Content local-game-test.log
+          exit $code
+
+      - name: Upload path-test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: local-game-test-log
+          path: local-game-test.log
+          if-no-files-found: ignore
+          retention-days: 1
+
+      - name: Test desktop pipeline
+        run: python -m unittest tools.wachterfeder.tests.test_desktop -v
+
+      - name: Test snapshot and dialogue deltas
+        run: python -m unittest tools.wachterfeder.tests.test_delta -v
+
+      - name: Test base game and expansion dialogue packages
+        run: python -m unittest tools.wachterfeder.tests.test_expansion_assets -v
