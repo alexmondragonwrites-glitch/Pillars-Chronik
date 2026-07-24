@@ -8,15 +8,19 @@ from tools.wachterfeder.desktop import analyse_savegame
 
 
 class DesktopPipelineTests(unittest.TestCase):
-    def test_analysis_writes_current_and_historical_reports(self) -> None:
+    def test_analysis_writes_current_snapshot_and_compact_delta(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             game_root = root / "Pillars of Eternity"
             data_root = game_root / "PillarsOfEternity_Data" / "data"
             (data_root / "conversations").mkdir(parents=True)
-            (data_root / "localized" / "de" / "text" / "conversations").mkdir(
-                parents=True
-            )
+            (
+                data_root
+                / "localized"
+                / "de"
+                / "text"
+                / "conversations"
+            ).mkdir(parents=True)
 
             savegame = root / "quicksave.savegame"
             saveinfo = """<?xml version="1.0" encoding="utf-8"?>
@@ -32,25 +36,45 @@ class DesktopPipelineTests(unittest.TestCase):
                 archive.writestr("MobileObjects.save", b"")
 
             try:
-                result = analyse_savegame(
+                first = analyse_savegame(
                     savegame,
                     game_path=game_root,
                     root=root,
                 )
 
-                self.assertEqual(result.player_name, "Serin Ashwyn")
-                self.assertEqual(result.scene_title, "Testgebiet")
-                self.assertEqual(result.matched_conversations, 0)
-                self.assertEqual(result.unresolved_conversations, 0)
-                self.assertTrue(result.snapshot_path.is_file())
-                self.assertTrue(result.report_path.is_file())
-                self.assertTrue(result.history_snapshot_path.is_file())
-                self.assertTrue(result.history_report_path.is_file())
-                self.assertTrue((root / ".wachterfeder" / "config.json").is_file())
+                self.assertEqual(first.player_name, "Serin Ashwyn")
+                self.assertEqual(first.scene_title, "Testgebiet")
+                self.assertEqual(first.matched_conversations, 0)
+                self.assertEqual(first.unresolved_conversations, 0)
+                self.assertTrue(first.initial_snapshot)
+                self.assertTrue(first.snapshot_path.is_file())
+                self.assertTrue(first.delta_path.is_file())
+                self.assertTrue(first.history_delta_path.is_file())
+                self.assertTrue(first.state_report_path.is_file())
+                self.assertTrue(
+                    (root / ".wachterfeder" / "config.json").is_file()
+                )
 
-                report = json.loads(result.report_path.read_text(encoding="utf-8"))
-                self.assertEqual(report["matched_conversations"], 0)
-                self.assertEqual(report["unresolved_conversations"], [])
+                delta = json.loads(
+                    first.delta_path.read_text(encoding="utf-8")
+                )
+                self.assertTrue(delta["initial_snapshot"])
+                self.assertEqual(
+                    delta["dialogue_changes"]["new_conversations"],
+                    [],
+                )
+
+                second = analyse_savegame(
+                    savegame,
+                    game_path=game_root,
+                    root=root,
+                )
+                self.assertFalse(second.initial_snapshot)
+                self.assertFalse(second.has_changes)
+                second_delta = json.loads(
+                    second.delta_path.read_text(encoding="utf-8")
+                )
+                self.assertFalse(second_delta["summary"]["has_changes"])
             finally:
                 # The production cache copy is deliberately read-only.
                 for path in root.rglob("*"):

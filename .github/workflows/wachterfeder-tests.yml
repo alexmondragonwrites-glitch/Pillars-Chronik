@@ -2,7 +2,7 @@ name: Wächterfeder tests
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, agent/wachterfeder-mvp]
     paths:
       - "Wachterfeder starten.bat"
       - "tools/wachterfeder/**"
@@ -53,6 +53,9 @@ jobs:
 
       - name: Test desktop pipeline
         run: python -m unittest tools.wachterfeder.tests.test_desktop -v
+
+      - name: Test snapshot and dialogue deltas
+        run: python -m unittest tools.wachterfeder.tests.test_delta -v
 
       - name: Test base game and expansion dialogue packages
         run: python -m unittest tools.wachterfeder.tests.test_expansion_assets -v
