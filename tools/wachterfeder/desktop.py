@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 
 try:
+    from tools.wachterfeder.delta import store_analysis_artifacts
     from tools.wachterfeder.dialogues import build_dialogue_report
     from tools.wachterfeder.local_game import (
         LocalGameAssets,
@@ -27,9 +28,9 @@ try:
         copy_read_only,
         inspect_savegame,
         newest_savegame,
-        write_snapshot,
     )
 except ModuleNotFoundError:  # Direct execution from tools/wachterfeder.
+    from delta import store_analysis_artifacts
     from dialogues import build_dialogue_report
     from local_game import (
         LocalGameAssets,
@@ -43,7 +44,6 @@ except ModuleNotFoundError:  # Direct execution from tools/wachterfeder.
         copy_read_only,
         inspect_savegame,
         newest_savegame,
-        write_snapshot,
     )
 
 
@@ -51,16 +51,31 @@ except ModuleNotFoundError:  # Direct execution from tools/wachterfeder.
 class DesktopAnalysisResult:
     savegame: Path
     snapshot_path: Path
-    report_path: Path
-    history_snapshot_path: Path
-    history_report_path: Path
+    delta_path: Path
+    history_delta_path: Path
+    state_report_path: Path
     player_name: str
     scene_title: str
     difficulty: str
     matched_conversations: int
     unresolved_conversations: int
     marked_nodes: int
+    initial_snapshot: bool
+    has_changes: bool
+    new_conversations: int
+    new_dialogue_nodes: int
+    changed_globals: int
     warnings: list[str]
+
+    @property
+    def report_path(self) -> Path:
+        """Compatibility alias for callers that opened the former full report."""
+        return self.delta_path
+
+    @property
+    def history_report_path(self) -> Path:
+        """Compatibility alias for the historical compact delta."""
+        return self.history_delta_path
 
 
 def repository_root() -> Path:
@@ -79,7 +94,9 @@ def _slug(value: str) -> str:
 
 
 def _history_key(savegame: Path, snapshot: SaveSnapshot) -> str:
-    stamp = datetime.fromtimestamp(savegame.stat().st_mtime).strftime("%Y%m%d-%H%M%S")
+    stamp = datetime.fromtimestamp(savegame.stat().st_mtime).strftime(
+        "%Y%m%d-%H%M%S"
+    )
     player_name = "save"
     if snapshot.metadata and snapshot.metadata.player_name:
         player_name = snapshot.metadata.player_name
@@ -101,6 +118,7 @@ def _resolve_assets(
 
 
 def _write_report(report: dict, output: Path) -> None:
+    """Write JSON for low-level callers that explicitly request a report."""
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n",
@@ -115,33 +133,29 @@ def analyse_savegame(
     language: str = "de",
     root: Path | None = None,
 ) -> DesktopAnalysisResult:
-    """Inspect a save and create current plus historical local reports."""
+    """Inspect a save and write a full current snapshot plus a compact delta."""
     root = (root or repository_root()).expanduser().resolve()
     savegame = savegame.expanduser().resolve()
     local_root = root / ".wachterfeder"
     config_path = local_root / "config.json"
-    history_root = local_root / "history"
 
     assets = _resolve_assets(game_path, language, config_path)
     working_copy = copy_read_only(savegame, local_root / "cache")
     snapshot = inspect_savegame(working_copy)
     key = _history_key(savegame, snapshot)
-
-    snapshot_path = local_root / "serin.snapshot.json"
-    history_snapshot_path = history_root / f"{key}.snapshot.json"
-    write_snapshot(snapshot, snapshot_path)
-    write_snapshot(snapshot, history_snapshot_path)
-
-    snapshot_payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+    snapshot_payload = asdict(snapshot)
     report = build_dialogue_report(
         snapshot_payload,
         assets.conversation_root,
         assets.stringtable_root,
     )
-    report_path = local_root / f"serin-dialoge-{assets.language}.json"
-    history_report_path = history_root / f"{key}.dialoge-{assets.language}.json"
-    _write_report(report, report_path)
-    _write_report(report, history_report_path)
+    artifacts = store_analysis_artifacts(
+        snapshot_payload,
+        report,
+        local_root=local_root,
+        history_key=key,
+        language=assets.language,
+    )
 
     metadata = snapshot.metadata
     player_name = (
@@ -156,15 +170,28 @@ def analyse_savegame(
     )
     return DesktopAnalysisResult(
         savegame=savegame,
-        snapshot_path=snapshot_path,
-        report_path=report_path,
-        history_snapshot_path=history_snapshot_path,
-        history_report_path=history_report_path,
+        snapshot_path=artifacts.snapshot_path,
+        delta_path=artifacts.delta_path,
+        history_delta_path=artifacts.history_delta_path,
+        state_report_path=artifacts.state_report_path,
         player_name=player_name,
-        scene_title=metadata.scene_title if metadata and metadata.scene_title else "Unbekannt",
-        difficulty=metadata.difficulty if metadata and metadata.difficulty else "Unbekannt",
+        scene_title=(
+            metadata.scene_title
+            if metadata and metadata.scene_title
+            else "Unbekannt"
+        ),
+        difficulty=(
+            metadata.difficulty
+            if metadata and metadata.difficulty
+            else "Unbekannt"
+        ),
         matched_conversations=int(report["matched_conversations"]),
         unresolved_conversations=len(report["unresolved_conversations"]),
         marked_nodes=marked_nodes,
+        initial_snapshot=artifacts.initial_snapshot,
+        has_changes=artifacts.has_changes,
+        new_conversations=artifacts.new_conversations,
+        new_dialogue_nodes=artifacts.new_dialogue_nodes,
+        changed_globals=artifacts.changed_globals,
         warnings=list(snapshot.warnings),
     )
