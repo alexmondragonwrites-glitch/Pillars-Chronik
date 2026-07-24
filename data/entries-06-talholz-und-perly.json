@@ -1,0 +1,70 @@
+[
+  {
+    "slug": "zwischen-muehlstein-und-hunger",
+    "title": "Zwischen Mühlstein und Hunger",
+    "type": "Kapitel XV · Vermittlung",
+    "date": "Am folgenden Tag",
+    "machineDate": "2823-05-20",
+    "location": "Mühle und Schwarzer Hund, Goldtal",
+    "summary": "Zwischen dem Müller Trumbel und Sweynurs hungernden Bauern droht der Streit in Gewalt umzuschlagen. Serin hört beiden Seiten zu, bringt drei Krüge Met mit und überzeugt Sweynur, Trumbels Familie in Frieden zu lassen.",
+    "journal": [
+      "Vor Goldtals Mühle schrien Bauern gegen eine verriegelte Tür. Sweynur warf Trumbel vor, Getreide zurückzuhalten und die Not des Dorfes für höhere Preise zu nutzen. Von drinnen antwortete der Müller mit der Drohung, jeden Eindringling niederzuschlagen.",
+      "Trumbel behauptete, die Ernte sei verdorben und Sweynur bedrohe seine Familie. Je länger ich fragte, desto weniger geradlinig wurde seine Geschichte. Einige Dörfler erhielten günstigere Preise, und nicht jeder wusste von den verbliebenen Vorräten.",
+      "Im Schwarzen Hund kaufte ich drei Krüge für Sweynur und seine Gefährten. Das Getränk öffnete keine Wahrheit, aber wenigstens ein Gespräch. Sweynur sprach von Hunger, ungleichen Preisen und Bauern, die kaum noch von ihrer Arbeit leben konnten.",
+      "Ich sagte ihm, dass Drohungen Trumbel nur tiefer in seine Mühle treiben würden. Er stimmte schließlich zu, die Familie in Frieden zu lassen und nach einem anderen Ausweg zu suchen.",
+      "Trumbel bot mir danach seine Tageseinnahmen an. Ich ließ sie bei ihm. Goldtal braucht derzeit Brot dringender als ich Münzen brauche."
+    ],
+    "decision": {
+      "title": "Den Frieden sichern, ohne eine Seite reinzuwaschen",
+      "choice": "Serin hört beiden Seiten zu, gibt Sweynurs Gruppe drei Krüge aus, beendet die Drohungen mit Worten und lehnt Trumbels Bezahlung ab.",
+      "consequence": "Der Streit endet ohne Blutvergießen. Sweynur lässt Trumbels Familie in Ruhe, Serins Ansehen in Goldtal wächst deutlich und der Konflikt um die knappen Vorräte bleibt als Warnung bestehen.",
+      "analysis": "Serin verwechselt Vermittlung nicht mit blinder Neutralität. Sie erkennt Sweynurs Hunger ebenso an wie die Gefahr seiner Drohungen und lässt auch Trumbels Widersprüche nicht unangetastet.",
+      "lesson": "Frieden bedeutet nicht, dass eine Seite recht bekommt. Manchmal bedeutet er zuerst nur, dass alle lange genug leben, um eine gerechtere Antwort zu finden."
+    }
+  },
+  {
+    "slug": "der-eintopf-im-talholz",
+    "title": "Der Eintopf im Talholz",
+    "type": "Kapitel XVI · Rettung",
+    "date": "Später im Talholz",
+    "machineDate": "2823-05-20",
+    "location": "Banditenlager im Talholz",
+    "summary": "Der vermisste Koch Tenfrith ist nicht vom Weg abgekommen. Banditen haben ihn gefangen und zwingen ihn, für sie zu kochen. Serins Gruppe befreit ihn und schickt ihn zurück zum Schwarzen Hund.",
+    "journal": [
+      "Die Schankwirtin des Schwarzen Hundes hatte ihren Koch Tenfrith zum Vorräteholen ins Talholz geschickt. Seit Tagen war er nicht zurückgekehrt, und in ihrer Küche blieb nur kalter Haferbrei.",
+      "Wir fanden Tenfrith über einem Eintopf. Um ihn herum warteten keine hungrigen Reisenden, sondern Banditen, die mit Dolchen darüber entschieden, wie viel Zeit Fleisch zum Garen bekommen durfte.",
+      "Als sie uns bemerkten, rief Tenfrith um Hilfe. Die Banditen griffen an. Danach war der Koch frei und der Eintopf vermutlich das Einzige im Lager, das noch eine Weile gefährlich blieb.",
+      "Tenfrith kehrte sofort nach Goldtal zurück. Wenig später stand er wieder an seinem Herd und versprach, im Schwarzen Hund von unserer Hilfe zu erzählen."
+    ],
+    "decision": {
+      "title": "Einen Vermissten nicht als erledigte Randnotiz behandeln",
+      "choice": "Serin sucht nach Tenfrith, stellt sich seinen Entführern und bringt ihn lebend nach Goldtal zurück.",
+      "consequence": "Tenfrith ist wieder im Schwarzen Hund, die Aufgabe ist abgeschlossen und Serin gewinnt erhebliches Ansehen in Goldtal.",
+      "analysis": "Die Rettung verändert keine große Lehre der Welt, aber sie gibt einem Menschen seinen Herd und einem Dorf ein Stück Alltag zurück. Gerade deshalb ist sie wichtig.",
+      "lesson": "Nicht jede gerettete Zukunft beginnt mit einer Prophezeiung. Manche beginnen mit einem Kochlöffel, der wieder in die richtige Hand gelangt."
+    }
+  },
+  {
+    "slug": "der-rote-umhang",
+    "title": "Der rote Umhang",
+    "type": "Kapitel XVII · Offenbarung",
+    "date": "In der Bärenhöhle",
+    "machineDate": "2823-05-20",
+    "location": "Bärenhöhle, Talholz",
+    "summary": "Bei Perlys Leichnam erlebt Serin dessen letzte Erinnerung. Nicht der Bär allein brachte ihn zu Fall: Nonton stach seinem Freund von hinten ins Bein und überließ ihn der Bestie.",
+    "journal": [
+      "Tief in der Höhle fanden wir den Mann, nach dem Nontons Geschichte gesucht hatte. Perly lag dort, doch etwas von ihm war geblieben: eine Gestalt aus kaltem Licht und verwischten Zügen.",
+      "Als ich die Hand ausstreckte, riss mich seine Erinnerung aus meinem eigenen Körper. Ich spürte einen Bogen in meinen Händen, hörte das Brüllen in der Dunkelheit und floh zum Ausgang.",
+      "Dann blitzte Metall hinter meinem Knie auf. Ein Freund stand am Rand der Höhle und sah zurück. Sein Dolch war rot, sein Umhang ebenfalls. Erst danach kam der Bär.",
+      "Ich kannte den Mann aus der Erinnerung. Nonton hatte Perly nicht nur verlassen. Er hatte dafür gesorgt, dass sein Freund nicht entkommen konnte.",
+      "Perlys Geist antwortete mit Wut und Trauer. Ich versprach, Nonton zu finden und ihn für seine Tat zur Verantwortung zu ziehen. Das Licht erlosch, aber die Wahrheit blieb."
+    ],
+    "decision": {
+      "title": "Aus Verdacht wird Verantwortung",
+      "choice": "Serin erkennt Nonton in Perlys letzter Erinnerung und verspricht dem Geist, ihn mit seiner Tat zu konfrontieren.",
+      "consequence": "Perlys Schicksal ist aufgeklärt und die Suche nach Gerechtigkeit beginnt. Nonton und Ingroed müssen erreicht werden, bevor ihre gepackten Taschen Goldtal verlassen.",
+      "analysis": "Serin besitzt nun mehr als ein ungutes Gefühl. Dennoch ist die Vision kein Freibrief für blinde Rache. Ihr Versprechen lautet, Nonton zur Verantwortung zu ziehen, nicht selbst zum Henker zu werden.",
+      "lesson": "Die Toten können keine Anklage vortragen. Manchmal hinterlassen sie nur ein Bild, das die Lebenden nicht mehr vergessen dürfen."
+    }
+  }
+]
