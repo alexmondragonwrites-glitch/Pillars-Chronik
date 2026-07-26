@@ -1,0 +1,167 @@
+{
+  "schema_version": 2,
+  "checkpoint_id": "serin-magrans-gabelung-2026-07-26",
+  "captured_at": "2026-07-26",
+  "source": {
+    "kind": "wachterfeder-delta+save-snapshot",
+    "save_sha256": "25f0da347698bcf0ebdc8cee9166371af979e59aba91b170b3e68362e3108706",
+    "previous_save_sha256": "c60db75b8cad364a2a59bc7433f1bafc7252c60849501b9d3cfa13de12131042",
+    "matched_conversations": 55,
+    "unresolved_conversations": [],
+    "marked_nodes": 807,
+    "snapshot_global_variables": 1937,
+    "raw_delta_committed": false,
+    "raw_snapshot_committed": false,
+    "local_config_committed": false
+  },
+  "delta_from_previous_checkpoint": {
+    "new_conversations": 3,
+    "additional_marked_nodes": 137,
+    "changed_globals": 14,
+    "changed_conversations": 9,
+    "additional_player_responses": 34,
+    "note": "Das kompakte Wächterfeder-Delta isoliert die Sitzung gegenüber dem Save aus der Bärenhöhle. Es erfasst auch neue Knoten in bereits bekannten Gesprächen."
+  },
+  "location": {
+    "region": "Magrans Gabelung",
+    "map_name": "AR_0802_Gilded_Vale_Wilderness",
+    "scene_title": "Magrans Gabelung",
+    "narrative_position": "Nach Durance' Beitritt auf dem Weg von Goldtal in Richtung Caed Nua"
+  },
+  "save_metadata": {
+    "difficulty": "Hard",
+    "tactical_mode": "RoundBased",
+    "chapter": 1,
+    "active_packages": ["BaseGame", "Expansion1", "Expansion2"],
+    "realtime_play_duration_seconds": 11648,
+    "playtime_seconds": 330676,
+    "real_timestamp": "07/26/2026 07:27:09"
+  },
+  "character_progression": {
+    "name": "Serin Ashwyn",
+    "level": 3,
+    "experience": 4816,
+    "base_attributes": {
+      "might": 14,
+      "constitution": 8,
+      "dexterity": 10,
+      "perception": 16,
+      "intellect": 17,
+      "resolve": 10
+    },
+    "persisted_skill_values": {
+      "athletics": 3,
+      "lore": 6,
+      "mechanics": 3,
+      "survival": 0,
+      "stealth": 0
+    },
+    "serialized_talents": ["TLN_Ancient_Memory"]
+  },
+  "new_conversations": [
+    "07_bs_villagers_misc_barks.conversation",
+    "companion_cv_durance_v2.conversation",
+    "companion_cv_eder_hub2.conversation"
+  ],
+  "changed_conversations": [
+    "07_bs_villagers_misc_barks.conversation",
+    "07_bs_villagers_misc_barks_b.conversation",
+    "07_cv_gilded_vale_innkeeper.conversation",
+    "07_cv_ingroed.conversation",
+    "07_cv_magistrate_urgeat.conversation",
+    "07_cv_tenfrith.conversation",
+    "companion_cv_durance_v2.conversation",
+    "companion_cv_eder.conversation",
+    "companion_cv_eder_hub2.conversation"
+  ],
+  "confirmed_events": [
+    "Serin konfrontierte Nonton mit Perlys letzter Erinnerung und fragte ihn nach seinem Motiv.",
+    "Ingroed erklärte, Perly sei ihr gewalttätiger Ehemann gewesen und habe sie nicht gehen lassen.",
+    "Serin verweigerte Schweigen gegen Münzen und kündigte an, Magistrat Urgeat zu informieren.",
+    "Nonton und Ingroed wurden feindselig; die Konfrontation endete im Kampf.",
+    "Serin meldete Perlys Mord bei Urgeat und nannte ihre Wächtervision als Beweisquelle.",
+    "Urgeat erkannte die Vision nicht als belastbaren Beweis an.",
+    "Urgeat teilte Serin mit, dass Raedrics Erbe nicht gesund geboren wurde, neue Heimstätten verboten sind und sie Goldtal verlassen solle.",
+    "Tenfrith und die Schankwirtin erklärten Serin zum Ehrengast des Schwarzen Hundes und gewährten ihr einen Preisnachlass.",
+    "Tenfrith gab Serin das Rezept für eine herzhafte Pastete.",
+    "Serin sprach mit Éder über Maerwald, seine Familie, die Säuberungen, Eothas und seine Zweifel an Waidwen.",
+    "Serin traf Durance an Magrans Gabelung und untersuchte Statue, Priester und Stab.",
+    "Durance behauptete, Serins Seele in den Flammen gesehen zu haben, und schloss sich ihrer Gruppe an."
+  ],
+  "confirmed_disposition_changes": [
+    {
+      "axis": "Diplomatic",
+      "strength": "Minor",
+      "context": "Serin fragt Nonton, warum er seinen Freund verraten hat."
+    },
+    {
+      "axis": "Honest",
+      "strength": "Average",
+      "context": "Serin verweigert Schweigen und kündigt an, Perlys Tod dem Magistrat zu melden."
+    }
+  ],
+  "reputation_changes": [
+    {
+      "faction": "GildedVale",
+      "axis": "Positive",
+      "strength": "Average",
+      "context": "Dank der Schankwirtin für Tenfriths Rettung und Ehrengaststatus"
+    },
+    {
+      "faction": "GildedVale",
+      "axis": "Positive",
+      "strength": "Minor",
+      "context": "Tenfrith übergibt Serin sein Rezept"
+    }
+  ],
+  "quest_state": {
+    "started": ["Durance' persönliche Aufgabe"],
+    "completed": ["Die Suche nach Tenfrith wurde im Schwarzen Hund endgültig abgeschlossen."],
+    "advanced": [
+      "Nontons Verrat: Konfrontation, Feindseligkeit und Meldung an Urgeat",
+      "Goldtal: Raedrics Heimstättenverbot beendet Serins geplante Ansiedlung im Dorf"
+    ],
+    "active_flags": {
+      "bDuranceCompletedIntro": 1,
+      "bPlayerEngagedDuranceIntro": 1,
+      "b_Savory_Pie": 1,
+      "b_black_hound_discount": 1,
+      "nDuranceQuestState": 1,
+      "n_AR_0802_State": 2,
+      "n_Aloth_rest": 2,
+      "n_Ingroed_State": 4,
+      "n_Nonton_Quest_Stage": 4,
+      "n_Nonton_State": 4,
+      "n_Tenfrith_State": 3,
+      "n_critpath_GV_state": 8
+    }
+  },
+  "party_state": {
+    "confirmed_companions": ["Aloth", "Éder", "Durance"],
+    "confirmed_pet": "Schwarzer Hund",
+    "recruitment_evidence": {
+      "aloth_joined": true,
+      "eder_joined_pre_maerwald": true,
+      "durance_add_to_party_script": true,
+      "durance_quest_state": 1,
+      "black_hound_acquired": true
+    }
+  },
+  "character_state": {
+    "identity": "Wächterin",
+    "lost_goal": "Eine neue Heimstätte in Goldtal wurde durch Raedrics Unterlassungsbefehl unmöglich.",
+    "new_companion": "Durance",
+    "deepened_bond": "Éder erzählte Serin von Familie, Säuberungen und seinem widersprüchlichen Glauben.",
+    "open_judgment": "Nontons Motiv ist verständlicher geworden; sein endgültiges Schicksal nach Beginn des Kampfes ist aus dem Delta nicht sicher ableitbar."
+  },
+  "open_threads": [
+    "Maerwald in Caed Nua aufsuchen und Serins Wächterfähigkeiten verstehen.",
+    "Durance' Behauptung untersuchen, er habe Serins Seele in Magrans Flammen gesehen.",
+    "Éders Fragen über Eothas, Waidwen, seinen Bruder und den Krieg weiterverfolgen.",
+    "Ranga in Anslogs Kompass finden und Aufra Hilfe für ihr ungeborenes Kind bringen.",
+    "Tuatanus verschwundene Eisenlieferung und seine Arbeiter finden.",
+    "Die Folgen von Raedrics Verbot neuer Heimstätten und der angekündigten Säuberung Goldtals beobachten.",
+    "Nontons und Ingroeds endgültiges Schicksal nach der feindseligen Konfrontation klären."
+  ],
+  "copyright_note": "Das Repository speichert nur abgeleitete Fakten und eigene Chronikprosa. Lokale Spieltexte, das vollständige Delta, der Save-Snapshot und die lokale Pfadkonfiguration werden nicht committed."
+}
