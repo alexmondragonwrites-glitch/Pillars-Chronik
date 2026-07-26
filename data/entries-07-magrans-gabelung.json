@@ -1,0 +1,112 @@
+[
+  {
+    "slug": "was-ein-freund-tat",
+    "title": "Was ein Freund tat",
+    "type": "Kapitel XVIII · Urteil",
+    "date": "Nach der Rückkehr aus der Bärenhöhle",
+    "machineDate": "2823-05-21",
+    "location": "Ingroeds Haus, Goldtal",
+    "summary": "Serin konfrontiert Nonton mit Perlys letzter Erinnerung. Ingroed offenbart, dass Perly ein gewalttätiger Ehemann gewesen sei. Serin hört die Erklärung an, verweigert aber Schweigen gegen Münzen und kündigt an, den Mord zu melden.",
+    "journal": [
+      "Ich kehrte zu den gepackten Taschen zurück und sagte Nonton, dass ich wusste, was in der Bärenhöhle geschehen war. Die Farbe wich aus seinem Gesicht, doch seine erste Antwort war eine weitere Lüge.",
+      "Ich fragte ihn, warum er Perly verraten hatte. Ingroed sprach schließlich aus, was hinter ihrer Flucht lag: Perly war ihr Ehemann gewesen, ein Mann, der sie nicht gehen ließ. Nonton nannte ihn grausam, selbst gegenüber seinen Freunden.",
+      "Die Erklärung machte die Tat verständlicher. Sie machte sie nicht ungeschehen. Als Ingroed mir ihre Ersparnisse anbot, sagte ich, dass ich den Magistrat informieren würde.",
+      "Nonton verspottete meine Vision und zog seine Klinge. Aus einem Gespräch über Verantwortung wurde ein Kampf, bevor irgendein Gericht die Wahrheit hören konnte."
+    ],
+    "decision": {
+      "title": "Erklärung anhören, Schweigen verweigern",
+      "choice": "Serin fragt Nonton nach seinem Motiv, hört Ingroeds Bericht über Perlys Gewalt an und kündigt dennoch an, den Mord dem Magistrat zu melden.",
+      "consequence": "Serin gewinnt diplomatische und ehrliche Disposition. Nonton und Ingroed werden feindselig; der Versuch einer friedlichen Rechenschaft endet im Kampf.",
+      "analysis": "Serin verwechselt Verständnis nicht mit Freispruch. Perlys Grausamkeit verändert das moralische Bild, aber weder Bestechung noch ein gutes Motiv dürfen die Verantwortung auslöschen.",
+      "lesson": "Eine Erklärung kann ein Urteil verändern. Sie darf die Wahrheit nicht kaufen."
+    }
+  },
+  {
+    "slug": "ein-mord-ohne-beweis",
+    "title": "Ein Mord ohne Beweis",
+    "type": "Kapitel XIX · Vertreibung",
+    "date": "Kurz darauf",
+    "machineDate": "2823-05-21",
+    "location": "Galgenbaum, Goldtal",
+    "summary": "Serin meldet Perlys Tod bei Magistrat Urgeat. Ihre Wächtervision gilt ihm nicht als Beweis. Zugleich verkündet er Raedrics Verbot neuer Heimstätten und rät Serin, Goldtal zu verlassen.",
+    "journal": [
+      "Ich meldete dem Magistrat einen Mord. Ich nannte Nonton und Perly und erklärte, dass ich die letzten Augenblicke des Toten in einer Vision gesehen hatte.",
+      "Urgeat hörte das Wort Vision und hörte danach kaum noch mich. Für ihn war mein Bericht ein gefährlicher Scherz, nicht die Aussage einer Wächterin. Sein Blick zum Galgenbaum sagte, welche Art von Beweisen Goldtal bevorzugte.",
+      "Dann teilte er mir mit, dass Raedrics Erbe nicht gesund geboren worden war. Der Fürst hatte neue Heimstätten verboten, bis das Dorf von Eothasianern und anderen angeblichen Schuldigen gereinigt sei.",
+      "Ich war nach Goldtal gekommen, um hier ein neues Leben aufzubauen. Urgeat sagte mir, dass es keinen Platz für mich gebe und dass ich das Dorf besser bald verlassen solle."
+    ],
+    "decision": {
+      "title": "Die Wahrheit melden, obwohl sie nicht beweisbar ist",
+      "choice": "Serin berichtet Urgeat offen von Nontons Tat und nennt ihre Seelenerinnerung als Quelle.",
+      "consequence": "Der Magistrat weist die Vision als unzureichenden Beweis zurück. Gleichzeitig endet Serins Hoffnung auf eine Heimstätte in Goldtal; der Weg nach Caed Nua wird dringlicher.",
+      "analysis": "Serins neue Gabe zeigt ihr Wahrheiten, die die bestehenden Institutionen weder prüfen noch anerkennen können. Sie entscheidet sich dennoch für Offenheit und trägt damit das Risiko, selbst verdächtig zu wirken.",
+      "lesson": "Eine Wahrheit wird nicht unwahr, weil ein Amt keinen Platz für sie in seinem Formular hat."
+    }
+  },
+  {
+    "slug": "ehrengast-des-schwarzen-hundes",
+    "title": "Ehrengast des Schwarzen Hundes",
+    "type": "Kapitel XX · Heimkehr",
+    "date": "Vor dem Aufbruch",
+    "machineDate": "2823-05-21",
+    "location": "Zum Schwarzen Hund, Goldtal",
+    "summary": "Tenfrith steht wieder an seinem Herd. Die Schankwirtin erklärt Serin zum Ehrengast, gewährt ihr Rabatt und Tenfrith vertraut ihr sein Rezept für eine herzhafte Pastete an.",
+    "journal": [
+      "Im Schwarzen Hund war der Haferbrei verschwunden. Tenfrith stand wieder in der Küche und begrüßte mich mit einer Freude, die den Raum wärmer machte als sein Herd.",
+      "Die Schankwirtin erklärte mich zum Ehrengast des Hauses. Zimmer, Met und Waren würden fortan günstiger sein. Goldtal hatte mir eine Heimstätte verweigert, doch diese Schänke bot wenigstens eine offene Tür.",
+      "Tenfrith bestand darauf, meine Hilfe nicht unvergolten zu lassen. Er gab mir sein bestgehütetes Rezept: eine herzhafte Pastete, die Reisende gesund und munter halten soll.",
+      "Zwischen Galgenbaum und Verbannung war es ein kleines Geschenk. Gerade deshalb werde ich es nicht vergessen."
+    ],
+    "decision": {
+      "title": "Die kleine Dankbarkeit annehmen",
+      "choice": "Serin nimmt Tenfriths Rezept und den Status als Ehrengast des Schwarzen Hundes an.",
+      "consequence": "Die Aufgabe um Tenfrith endet endgültig. Serin erhält einen dauerhaften Preisnachlass, das Rezept für herzhafte Pastete und weiteres Ansehen in Goldtal.",
+      "analysis": "Serin lehnt Belohnungen nicht aus Prinzip ab. Wo Dankbarkeit Gemeinschaft schafft statt Not auszunutzen, darf sie angenommen werden.",
+      "lesson": "Manchmal ist ein Rezept die freundlichste Form, in der ein gerettetes Leben Danke sagt."
+    }
+  },
+  {
+    "slug": "was-eder-noch-glaubt",
+    "title": "Was Éder noch glaubt",
+    "type": "Kapitel XXI · Vertrauen",
+    "date": "Auf dem Weg aus Goldtal",
+    "machineDate": "2823-05-21",
+    "location": "Unterwegs mit Éder",
+    "summary": "Serin fragt Éder nach Caed Nua, seiner Familie, den Säuberungen und seinem Glauben. Hinter seinen Scherzen zeigt sich ein Mann, der Eothas bezweifelt, dessen Ideale aber nicht aufgeben kann.",
+    "journal": [
+      "Éder hofft, dass Maerwald in Caed Nua noch lebt. Er will den alten Wächter über den Krieg und über Dinge fragen, für die er seine Gelegenheit längst verloren glaubte.",
+      "Ich fragte nach seinem Leben vor unserer Reise. Er war Bauer, Soldat und beinahe Prediger. Seine Eltern flohen während der Säuberungen zurück nach Aedyr; Éder blieb in einem Dorf, das ihn zunehmend für seinen Glauben hasste.",
+      "Er erzählte von Eothas als Gaun, dem Beschützer der Schwachen und Begleiter der Übergänge. Waidwens Einmarsch passte für ihn nicht zu diesem Gott. Seit dem Götterhammer antwortet Eothas nicht mehr.",
+      "Trotzdem hält Éder an dem fest, wofür sein Gott einst stand: Erlösung, Licht und die Hoffnung, dass Menschen trotz ihrer Fehler angenommen werden können. Vielleicht verehrt er heute weniger einen Gott als die Möglichkeit, dass dessen beste Gedanken den Tod überleben."
+    ],
+    "decision": {
+      "title": "Hinter den Scherzen nach dem Glauben fragen",
+      "choice": "Serin spricht mit Éder ausführlich über seine Vergangenheit, seine Familie, die Eothasianer-Säuberungen und seine Zweifel an Waidwen.",
+      "consequence": "Éders Gründe für die Reise nach Caed Nua werden klarer. Zwischen ihm und Serin entsteht mehr persönliches Verständnis, auch wenn seine Fragen an Eothas offen bleiben.",
+      "analysis": "Serin behandelt Glauben nicht als richtige oder falsche Antwort, sondern als Geschichte eines Menschen. Gerade ihre eigene Skepsis erlaubt Éder, Zweifel auszusprechen, ohne seinen letzten Halt verteidigen zu müssen.",
+      "lesson": "Manchmal bleibt von einem verstummten Gott nicht Gewissheit, sondern ein Wert, den jemand weiterhin zu leben versucht."
+    }
+  },
+  {
+    "slug": "der-mann-im-feuer",
+    "title": "Der Mann im Feuer",
+    "type": "Kapitel XXII · Begegnung",
+    "date": "An Magrans Gabelung",
+    "machineDate": "2823-05-21",
+    "location": "Magrans Gabelung",
+    "summary": "An einer brennenden Magran-Statue begegnet Serin dem Priester Durance. Er behauptet, ihre Seele in den Flammen gesehen zu haben, erkennt sie als Wächterin und schließt sich ihrer Reise an.",
+    "journal": [
+      "An Magrans Gabelung kauerte ein vernarbter Mann vor einer Statue. Als er sprach, ging der Stein in Flammen auf, ohne Hitze zu geben. Sein Stab wirkte, als sei ihm eine größere und gefährlichere Kraft genommen worden.",
+      "Ich betrachtete die Statue, den Mann und seinen geschwärzten Stab. Er nannte sich schließlich Durance und sagte, er prüfe Seelen, während ich sie beobachte.",
+      "Er behauptete, meine Seele in den Flammen gesehen zu haben, zu einem Knoten zusammengezogen. Unsere gemeinsame Reise sei ihm vorgegeben, und auf dem Weg könnten wir einander Antworten liefern.",
+      "Ich fragte nach den Spuren, die er an mir sah. Danach lud ich ihn ein, sofern seine steinerne Herrin es gestattete. Durance lachte über Magrans mögliche Eifersucht und trat unserer Gruppe bei."
+    ],
+    "decision": {
+      "title": "Den unbequemen Propheten mitnehmen",
+      "choice": "Serin untersucht Durance und seine Zeichen gründlich, stellt Fragen zu seiner Erkenntnis und nimmt ihn schließlich in die Gruppe auf.",
+      "consequence": "Durance schließt sich Serin, Aloth und Éder an. Seine persönliche Aufgabe beginnt; seine Vision von Serins Seele wird zu einem neuen offenen Rätsel.",
+      "analysis": "Durance ist grob, provokant und voller Gewissheiten, denen Serin misstraut. Gerade deshalb weist sie ihn nicht vorschnell ab. Wissen kann auch in einer Stimme stecken, die man nur schwer erträgt.",
+      "lesson": "Nicht jeder Lehrer spricht freundlich. Das macht seine Antworten weder wahr noch wertlos."
+    }
+  }
+]
