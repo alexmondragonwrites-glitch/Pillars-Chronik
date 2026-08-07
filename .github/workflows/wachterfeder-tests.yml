@@ -59,3 +59,6 @@ jobs:
 
       - name: Test base game and expansion dialogue packages
         run: python -m unittest tools.wachterfeder.tests.test_expansion_assets -v
+
+      - name: Test Baldur's Gate EET adapter
+        run: python -m unittest tools.wachterfeder.tests.test_eet -v
