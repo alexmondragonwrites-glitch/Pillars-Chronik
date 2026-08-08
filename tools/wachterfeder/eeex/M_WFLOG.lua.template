@@ -11,11 +11,10 @@
 -- Both were too fragile across EEex / EET configurations, and the V6 startup
 -- diagnostic could crash during early engine initialization.
 --
--- Instead V7 stores a very small namespaced telemetry record in GLOBAL save
--- variables through EEex_GameState_SetGlobalInt/String(). Existing game
--- variables are never overwritten. Wächterfeder reads WF_* values from the
--- next save and removes them from story inference unless explicitly used as
--- telemetry evidence.
+-- Instead V7 stores a very small namespaced integer telemetry record in GLOBAL
+-- save variables through EEex_GameState_SetGlobalInt(). Existing game variables
+-- are never overwritten. Integer globals are deliberately used because the
+-- normal GAME V2.0 save parser can read them without any EEex runtime support.
 
 local WF_OBSERVERS_INSTALLED = false
 local WF_ORIGINAL_SELECT_DIALOGUE_OPTION = nil
@@ -33,13 +32,6 @@ local function wf_get_int(name)
     return tonumber(value) or 0
 end
 
-local function wf_set_string(name, value)
-    if type(EEex_GameState_SetGlobalString) ~= "function" then return false end
-    local text = tostring(value or "")
-    if #text > 31 then text = string.sub(text, 1, 31) end
-    return pcall(function() EEex_GameState_SetGlobalString(name, text) end)
-end
-
 local function wf_safe_call(func_name, fallback)
     local func = _G[func_name]
     if type(func) ~= "function" then return fallback end
@@ -48,16 +40,21 @@ local function wf_safe_call(func_name, fallback)
     return fallback
 end
 
+local function wf_store_arg(index, value)
+    local number = tonumber(value)
+    wf_set_int("WF_DLG_A" .. tostring(index) .. "_NUM", number ~= nil and 1 or 0)
+    wf_set_int("WF_DLG_A" .. tostring(index), number or 0)
+end
+
 local function wf_capture_dialogue_choice(...)
     local args = {...}
     local seq = wf_get_int("WF_DIALOG_SEQ") + 1
     wf_set_int("WF_DIALOG_SEQ", seq)
     wf_set_int("WF_DIALOG_ARGC", #args)
-    wf_set_string("WF_DIALOG_ARG1", args[1])
-    wf_set_string("WF_DIALOG_ARG2", args[2])
-    wf_set_string("WF_DIALOG_ARG3", args[3])
-    wf_set_string("WF_DIALOG_ARG4", args[4])
-    wf_set_string("WF_DIALOG_SCREEN", wf_safe_call("Infinity_GetCurrentScreenName", ""))
+    wf_store_arg(1, args[1])
+    wf_store_arg(2, args[2])
+    wf_store_arg(3, args[3])
+    wf_store_arg(4, args[4])
     wf_set_int("WF_DIALOG_TICKS", wf_safe_call("Infinity_GetGameTicks", -1))
 end
 
@@ -65,9 +62,8 @@ local function wf_install_observers()
     if WF_OBSERVERS_INSTALLED then return end
     WF_OBSERVERS_INSTALLED = true
 
-    -- Heartbeat that is intentionally persisted in the next save. The boot
-    -- sequence lets Wächterfeder distinguish a fresh EEex initialization from
-    -- an old telemetry value already present in the save.
+    -- Persisted heartbeat. The boot sequence distinguishes a fresh EEex start
+    -- from telemetry already present in an older save.
     wf_set_int("WF_RUNTIME_VERSION", 7)
     wf_set_int("WF_RUNTIME_BOOT_SEQ", wf_get_int("WF_RUNTIME_BOOT_SEQ") + 1)
 
@@ -88,6 +84,6 @@ if type(EEex_GameState_AddInitializedListener) == "function" then
     EEex_GameState_AddInitializedListener(wf_install_observers)
 else
     -- Current EEex provides the listener. The fallback remains guarded and
-    -- contains no native UI calls or C-runtime/file operations.
+    -- contains no native UI calls, CLUAConsole instances, or file operations.
     pcall(wf_install_observers)
 end
