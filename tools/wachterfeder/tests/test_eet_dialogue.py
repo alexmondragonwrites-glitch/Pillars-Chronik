@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import tempfile
 import unittest
+from pathlib import Path
 
-from tools.wachterfeder.eet_dialogue import parse_weidu_dialogue, resolve_dialogue_event
+from tools.wachterfeder.eet_dialogue import _weidu_relative_output, parse_weidu_dialogue, resolve_dialogue_event
 
 
 DIALOGUE = r'''
@@ -61,6 +63,15 @@ class EetDialogueTests(unittest.TestCase):
         resolved = resolve_dialogue_event(event, graph, delta)
         self.assertEqual(resolved["confidence"], "medium")
         self.assertIsNone(resolved["confirmed_reply"])
+
+    def test_weidu_output_is_relative_to_game_root(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            game_root = Path(temporary).resolve()
+            out = game_root / ".wachterfeder-eet-dialog-test" / "TORLO.d"
+            argument = _weidu_relative_output(out, game_root)
+            self.assertFalse(Path(argument).is_absolute())
+            self.assertNotIn(":", argument)
+            self.assertTrue(argument.endswith("TORLO.d"))
 
 
 if __name__ == "__main__":
