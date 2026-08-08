@@ -5,13 +5,14 @@
 -- WACHTERFEDER_EET_RUNTIME_LOGGER_V5
 -- WACHTERFEDER_EET_RUNTIME_LOGGER_V6
 -- WACHTERFEDER_EET_SAVE_TELEMETRY_V7
+-- WACHTERFEDER_EET_SAVE_TELEMETRY_V7_1
 -- Generated into the local EET override folder by Wächterfeder.
 --
--- V7 intentionally abandons native UI diagnostics and CLUA/file logging.
+-- V7.1 intentionally abandons native UI diagnostics and CLUA/file logging.
 -- Both were too fragile across EEex / EET configurations, and the V6 startup
 -- diagnostic could crash during early engine initialization.
 --
--- Instead V7 stores a very small namespaced integer telemetry record in GLOBAL
+-- Instead V7.1 stores a very small namespaced integer telemetry record in GLOBAL
 -- save variables through EEex_GameState_SetGlobalInt(). Existing game variables
 -- are never overwritten. Integer globals are deliberately used because the
 -- normal GAME V2.0 save parser can read them without any EEex runtime support.
@@ -74,7 +75,9 @@ local function wf_install_observers()
     if dialogue_hook_available then
         WF_ORIGINAL_SELECT_DIALOGUE_OPTION = original
         function Infinity_SelectDialogueOption(...)
-            pcall(function() wf_capture_dialogue_choice(...) end)
+            -- Lua 5.1 forbids using ... inside a nested anonymous function.
+            -- pcall itself accepts the forwarded varargs directly.
+            pcall(wf_capture_dialogue_choice, ...)
             return WF_ORIGINAL_SELECT_DIALOGUE_OPTION(...)
         end
     end
@@ -84,6 +87,6 @@ if type(EEex_GameState_AddInitializedListener) == "function" then
     EEex_GameState_AddInitializedListener(wf_install_observers)
 else
     -- Current EEex provides the listener. The fallback remains guarded and
-    -- contains no native UI calls, CLUAConsole instances, or file operations.
+    -- contains no native UI calls, console instances, or file operations.
     pcall(wf_install_observers)
 end
