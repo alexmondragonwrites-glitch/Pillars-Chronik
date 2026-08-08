@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only EET dialogue resolver backed by the locally installed WeiDU.
 
-Wächterfeder never ships or commits game dialogue assets.  For a dialogue that
+Wächterfeder never ships or commits game dialogue assets. For a dialogue that
 actually changed between two saves, this module asks the user's own modded EET
 installation to decompile the effective DLG into temporary WeiDU D text, parses
 its finite-state transitions, and compares observable transition effects with
@@ -127,6 +127,21 @@ def parse_weidu_dialogue(text: str, *, dialog: str | None = None) -> JsonObject:
     return {"dialog": dialog_name, "state_count": len(states), "states": states}
 
 
+def _weidu_relative_output(output: Path, game_root: Path) -> str:
+    """Return a WeiDU-safe relative output path.
+
+    Current Windows WeiDU builds can interpret an absolute ``C:\\...`` output
+    path as ``./C:/...`` and fail with ``Unix.EINVAL``. Keeping the temporary
+    directory inside the game root lets us pass a plain relative path while the
+    files are still ephemeral and removed immediately after parsing.
+    """
+    try:
+        relative = output.resolve().relative_to(game_root.resolve())
+    except ValueError as exc:
+        raise EetError("Temporäre WeiDU-Ausgabe liegt nicht innerhalb des Spielordners.") from exc
+    return relative.as_posix()
+
+
 def decompile_dialogue(
     dialog: str,
     *,
@@ -142,15 +157,19 @@ def decompile_dialogue(
     if assets.weidu is None:
         raise EetError("WeiDU wurde im EET-Spielordner nicht gefunden.")
 
-    with tempfile.TemporaryDirectory(prefix="wachterfeder-eet-dialog-") as temporary:
+    # WeiDU's Windows path handling for --out does not reliably accept drive-
+    # qualified absolute paths. Create the temporary directory below the game
+    # root and pass only a relative POSIX-style path to WeiDU.
+    with tempfile.TemporaryDirectory(prefix=".wachterfeder-eet-dialog-", dir=assets.game_root) as temporary:
         out = Path(temporary) / f"{resref}.d"
+        out_argument = _weidu_relative_output(out, assets.game_root)
         command = [
             str(assets.weidu),
             "--noautoupdate",
             "--nofrom",
             f"{resref}.dlg",
             "--out",
-            str(out),
+            out_argument,
             "--text",
         ]
         completed = subprocess.run(
