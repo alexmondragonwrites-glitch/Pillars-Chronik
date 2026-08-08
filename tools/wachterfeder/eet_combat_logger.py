@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Install the optional Wächterfeder EEex save-telemetry observer.
 
-V7.1 no longer relies on native UI diagnostics, console logging, or direct
-file I/O from Lua. The installed ``M_WFLOG.lua`` writes only namespaced WF_*
-integer GLOBAL values into the next save. The normal EET save parser reads
+V7.2 avoids native UI diagnostics, console logging, and direct file I/O from
+Lua. The installed ``M_WFLOG.lua`` writes namespaced WF_* integer GLOBAL values
+only after a real dialogue choice is observed. The normal EET save parser reads
 those values afterwards. Legacy log-reader helpers remain for old snapshots.
 """
 from __future__ import annotations
@@ -21,7 +21,7 @@ except ModuleNotFoundError:  # direct execution from tools/wachterfeder
 
 JsonObject = dict[str, Any]
 LOGGER_MARKER = "WACHTERFEDER_EET_COMBAT_LOGGER_V1"
-LOGGER_CURRENT_MARKER = "WACHTERFEDER_EET_SAVE_TELEMETRY_V7_1"
+LOGGER_CURRENT_MARKER = "WACHTERFEDER_EET_SAVE_TELEMETRY_V7_2"
 LOGGER_SCRIPT_NAME = "M_WFLOG.lua"
 ENGINE_LOG_NAME = "Wachterfeder-runtime.log"  # legacy V3-V6 file
 TEMPLATE_RELATIVE = Path("tools/wachterfeder/eeex/M_WFLOG.lua.template")
@@ -86,7 +86,7 @@ def logger_status(game_path: Path, *, root: Path | None = None, language: str = 
         installed=installed,
         up_to_date=up_to_date,
         # V7+ intentionally has no live file heartbeat. Activity is confirmed
-        # after saving, via WF_RUNTIME_VERSION / WF_RUNTIME_BOOT_SEQ.
+        # after a dialogue choice has been saved as WF_* globals.
         runtime_active=False,
         script_path=script,
         log_path=log_path,
@@ -128,7 +128,7 @@ def install_logger(game_path: Path, *, root: Path | None = None, language: str =
     status = logger_status(assets.game_root, root=root, language=language)
     if not status.up_to_date:
         raise EetError(
-            "Die EEex-Save-Telemetrie wurde geschrieben, aber V7.1 konnte danach nicht bestätigt werden."
+            "Die EEex-Save-Telemetrie wurde geschrieben, aber V7.2 konnte danach nicht bestätigt werden."
         )
     return status
 
@@ -287,7 +287,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     else:
         telemetry_text = "nicht installiert"
     print(f"Telemetrie: {telemetry_text}")
-    print("Aktivität: wird nach dem nächsten Speichern über WF_* GLOBALs geprüft")
+    print("Aktivität: wird nach Dialog + Speichern über WF_* GLOBALs geprüft")
     print(f"Script:    {status.script_path}")
     return 0
 
