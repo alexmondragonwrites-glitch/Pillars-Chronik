@@ -6,13 +6,17 @@ import json
 from pathlib import Path
 from typing import Any
 
-from tools.wachterfeder.eet_combat_logger import (
-    log_metadata,
-    read_new_events,
-    runtime_log_path,
-    summarise_events,
-)
-from tools.wachterfeder.eet_session import EetSessionResult, analyse_session as analyse_base_session
+try:
+    from tools.wachterfeder.eet_combat_logger import (
+        log_metadata,
+        read_new_events,
+        runtime_log_path,
+        summarise_events,
+    )
+    from tools.wachterfeder.eet_session import EetSessionResult, analyse_session as analyse_base_session
+except ModuleNotFoundError:  # direct execution from tools/wachterfeder
+    from eet_combat_logger import log_metadata, read_new_events, runtime_log_path, summarise_events
+    from eet_session import EetSessionResult, analyse_session as analyse_base_session
 
 JsonObject = dict[str, Any]
 
@@ -89,8 +93,6 @@ def analyse_session(
 ) -> EetSessionResult:
     root = (root or Path(__file__).resolve().parents[2]).expanduser().resolve()
 
-    # Let the established save-diff pipeline finish first. Only after a
-    # successful analysis do we advance the independent runtime-log cursor.
     result = analyse_base_session(
         save_path=save_path,
         game_path=game_path,
