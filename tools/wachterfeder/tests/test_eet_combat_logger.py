@@ -6,6 +6,7 @@ from pathlib import Path
 
 from tools.wachterfeder.eet_combat_logger import (
     LOGGER_MARKER,
+    LOG_PREFIX,
     install_logger,
     read_new_events,
     runtime_log_path,
@@ -50,22 +51,41 @@ class EetCombatLoggerTests(unittest.TestCase):
             self.assertFalse(status.installed)
             self.assertFalse((game / "override" / "M_WFLOG.lua").exists())
 
-    def test_reader_returns_only_appended_valid_json_lines(self) -> None:
+    def test_reader_accepts_prefixed_clua_lines_and_ignores_engine_noise(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             log = Path(temporary) / "combat.jsonl"
-            log.write_text('{"event":"old"}\n', encoding="utf-8")
+            log.write_text("old engine output\n", encoding="utf-8")
             offset = log.stat().st_size
             with log.open("a", encoding="utf-8") as handle:
-                handle.write('{"event":"damage","damage":7,"lethal_candidate":false}\n')
-                handle.write('not-json\n')
-                handle.write('{"event":"damage","damage":5,"lethal_candidate":true}\n')
+                handle.write('Some engine prefix ' + LOG_PREFIX + '{"event":"damage","damage":7,"lethal_candidate":false}\n')
+                handle.write('ordinary unrelated engine line\n')
+                handle.write(LOG_PREFIX + '{"event":"damage","damage":5,"lethal_candidate":true}\n')
 
             events, metadata = read_new_events(log, offset)
             self.assertEqual(len(events), 2)
-            self.assertEqual(metadata["malformed_lines"], 1)
+            self.assertEqual(metadata["malformed_lines"], 0)
             summary = summarise_events(events)
             self.assertEqual(summary["damage_total"], 12)
             self.assertEqual(summary["lethal_candidates"], 1)
+
+    def test_reader_keeps_legacy_bare_json_support(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            log = Path(temporary) / "combat.jsonl"
+            log.write_text('{"event":"damage","damage":3}\nnot-json\n', encoding="utf-8")
+            events, metadata = read_new_events(log, 0)
+            self.assertEqual(len(events), 1)
+            self.assertEqual(events[0]["damage"], 3)
+            # Unprefixed engine/noise lines are ignored rather than treated as logger corruption.
+            self.assertEqual(metadata["malformed_lines"], 0)
+
+    def test_real_template_does_not_assume_lua_io_exists(self) -> None:
+        template = Path(__file__).resolve().parents[1] / "eeex" / "M_WFLOG.lua.template"
+        text = template.read_text(encoding="utf-8")
+        self.assertIn('type(io) == "table"', text)
+        self.assertIn("C:LogSet(WF_LOG_PATH)", text)
+        self.assertIn("C:LogMessages()", text)
+        self.assertIn("Infinity_Log", text)
+        self.assertIn("pcall(function() wf_append", text)
 
     def test_delta_augmentation_keeps_combat_events_compact(self) -> None:
         delta = {"summary": {"has_changes": False}, "changes": {}, "notes": []}
