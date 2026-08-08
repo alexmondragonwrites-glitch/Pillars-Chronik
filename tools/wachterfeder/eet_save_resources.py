@@ -2,7 +2,7 @@
 """Read-only helpers for EET save resources beyond BALDUR.GAM.
 
 Enhanced Edition saves keep persistent area/store resources in BALDUR.SAV and
-embed the live CRE records of party members inside BALDUR.GAM.  These helpers
+embed the live CRE records of party members inside BALDUR.GAM. These helpers
 extract chronology-relevant facts without copying game assets into the repo.
 """
 from __future__ import annotations
@@ -254,12 +254,14 @@ def collect_sav_state(
         variables = parse_area_variables(data)
         if variables:
             area_variables[area] = variables
-        actors = parse_area_actor_talks(data, resolve_strref=resolve_strref)
-        if actors:
-            actor_talks[area] = actors
+        # Keep every saved area in the snapshot, even when no actor has ever
+        # been spoken to. This makes the area count exact while actor_talk_delta
+        # simply ignores empty lists.
+        actor_talks[area] = parse_area_actor_talks(data, resolve_strref=resolve_strref)
     return {
         "resource_count": len(resources),
         "resource_types": {key or "<none>": value for key, value in sorted(types.items())},
+        "area_count": int(types.get(".are", 0)),
         "area_variables": area_variables,
         "actor_talks": actor_talks,
         "has_default_toh": any(name.casefold() == "default.toh" for name in resources),
