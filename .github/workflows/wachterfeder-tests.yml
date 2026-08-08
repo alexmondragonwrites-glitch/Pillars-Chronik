@@ -76,5 +76,11 @@ jobs:
       - name: Test EET real-session delta
         run: python -m unittest tools.wachterfeder.tests.test_eet_session -v
 
+      - name: Test EET runtime HP and party-talk deltas
+        run: python -m unittest tools.wachterfeder.tests.test_eet_session_runtime -v
+
+      - name: Test EET WeiDU dialogue resolver
+        run: python -m unittest tools.wachterfeder.tests.test_eet_dialogue -v
+
       - name: Test EET EEex combat logger
         run: python -m unittest tools.wachterfeder.tests.test_eet_combat_logger -v
