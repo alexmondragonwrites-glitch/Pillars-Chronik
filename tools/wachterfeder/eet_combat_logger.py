@@ -21,7 +21,7 @@ except ModuleNotFoundError:  # direct execution from tools/wachterfeder
 
 JsonObject = dict[str, Any]
 LOGGER_MARKER = "WACHTERFEDER_EET_COMBAT_LOGGER_V1"
-LOGGER_CURRENT_MARKER = "WACHTERFEDER_EET_RUNTIME_LOGGER_V3"
+LOGGER_CURRENT_MARKER = "WACHTERFEDER_EET_RUNTIME_LOGGER_V4"
 LOGGER_SCRIPT_NAME = "M_WFLOG.lua"
 ENGINE_LOG_NAME = "Wachterfeder-runtime.log"
 TEMPLATE_RELATIVE = Path("tools/wachterfeder/eeex/M_WFLOG.lua.template")
@@ -43,11 +43,7 @@ def repository_root() -> Path:
 
 
 def runtime_log_path(root: Path | None = None, *, game_root: Path | None = None) -> Path:
-    """Return the V3 engine log path, or the legacy repo-local path.
-
-    ``game_root`` should be supplied by normal EET runtime analysis. The legacy
-    fallback is retained so older tests/tools can still read pre-V3 JSONL logs.
-    """
+    """Return the V3+ engine log path, or the legacy repo-local path."""
     if game_root is not None:
         return game_root.expanduser().resolve() / ENGINE_LOG_NAME
     root = (root or repository_root()).expanduser().resolve()
@@ -66,8 +62,6 @@ def _runtime_has_heartbeat(log_path: Path) -> bool:
     try:
         if not log_path.is_file() or log_path.stat().st_size <= 0:
             return False
-        # Heartbeat should be near the beginning/end of a small local log. Read
-        # the whole file for simplicity; the runtime log is intentionally tiny.
         text = log_path.read_text(encoding="utf-8", errors="replace")
     except OSError:
         return False
@@ -96,8 +90,13 @@ def logger_status(game_path: Path, *, root: Path | None = None, language: str = 
     )
 
 
-def _render_template(*, root: Path) -> str:
-    return (root / TEMPLATE_RELATIVE).read_text(encoding="utf-8")
+def _render_template(log_path: Path, *, root: Path) -> str:
+    template = (root / TEMPLATE_RELATIVE).read_text(encoding="utf-8")
+    # Lua long strings accept forward slashes on Windows and avoid escaping
+    # backslashes. V4 uses an absolute path so C:LogSet does not depend on the
+    # process working directory chosen by InfinityLoader/Baldur.exe.
+    portable = log_path.resolve().as_posix()
+    return template.replace("__WACHTERFEDER_LOG_PATH__", portable)
 
 
 def install_logger(game_path: Path, *, root: Path | None = None, language: str = "de_DE") -> CombatLoggerStatus:
@@ -116,12 +115,12 @@ def install_logger(game_path: Path, *, root: Path | None = None, language: str =
                 f"{script.name} existiert bereits und gehört nicht eindeutig zu Wächterfeder. Datei bleibt unangetastet."
             )
 
-    script.parent.mkdir(parents=True, exist_ok=True)
-    script.write_text(_render_template(root=root), encoding="utf-8")
-
-    # Prepare a clean, Wächterfeder-owned engine log. The Lua observer writes
-    # the runtime_start heartbeat after the next InfinityLoader launch.
     log_path = runtime_log_path(root, game_root=assets.game_root)
+    script.parent.mkdir(parents=True, exist_ok=True)
+    script.write_text(_render_template(log_path, root=root), encoding="utf-8")
+
+    # Prepare a clean, Wächterfeder-owned engine log. V4 writes runtime_start
+    # only after EEex reports that the Lua game state has been initialized.
     try:
         log_path.write_text("", encoding="utf-8")
     except OSError as exc:
@@ -151,8 +150,6 @@ def uninstall_logger(game_path: Path, *, root: Path | None = None, language: str
         if log_path.exists():
             log_path.unlink()
     except OSError:
-        # The script removal is the important reversible operation. A locked
-        # engine log can safely remain local and is ignored without the script.
         pass
     return logger_status(assets.game_root, root=root, language=language)
 
@@ -185,10 +182,19 @@ def _json_payload_from_log_line(raw_line: bytes) -> tuple[str | None, bool]:
     marker = text.find(LOG_PREFIX)
     if marker >= 0:
         return text[marker + len(LOG_PREFIX) :].strip(), True
-    # Legacy V1/V2 direct-json lines remain readable.
     if text.startswith("{"):
         return text, True
     return None, False
+
+
+def _event_identity(item: JsonObject) -> tuple[Any, ...]:
+    """Stable identity used to collapse print + Infinity_Log duplicate emits."""
+    schema = item.get("schema_version")
+    seq = item.get("seq")
+    event = item.get("event")
+    if seq is not None:
+        return (schema, seq, event)
+    return (json.dumps(item, ensure_ascii=False, sort_keys=True),)
 
 
 def read_new_events(log_path: Path, start_offset: int) -> tuple[list[JsonObject], JsonObject]:
@@ -198,11 +204,11 @@ def read_new_events(log_path: Path, start_offset: int) -> tuple[list[JsonObject]
         return [], {"exists": False, "cursor": 0, "size": 0, "malformed_lines": 0}
 
     offset = max(0, int(start_offset or 0))
-    # C:LogSet may recreate/truncate the file on a new game launch.
     if offset > size:
         offset = 0
 
     events: list[JsonObject] = []
+    seen: set[tuple[Any, ...]] = set()
     malformed = 0
     with log_path.open("rb") as handle:
         handle.seek(offset)
@@ -221,10 +227,14 @@ def read_new_events(log_path: Path, start_offset: int) -> tuple[list[JsonObject]
         except json.JSONDecodeError:
             malformed += 1
             continue
-        if isinstance(item, dict):
-            events.append(item)
-        else:
+        if not isinstance(item, dict):
             malformed += 1
+            continue
+        identity = _event_identity(item)
+        if identity in seen:
+            continue
+        seen.add(identity)
+        events.append(item)
 
     metadata = log_metadata(log_path)
     metadata["cursor"] = cursor
