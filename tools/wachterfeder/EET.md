@@ -77,9 +77,58 @@ Aktuell erfasst werden:
 - persistente NPC-Gesprächszähler (`NumTimesTalkedTo`) aus gespeicherten ARE-Ressourcen,
 - Änderungen all dieser Werte zwischen zwei Saves.
 
-## Kampfprotokoll
+## Optionaler EEex-Combat-Logger
 
-Der Save enthält kein vollständiges zeilenweises Protokoll der sichtbaren Kampfmeldungen. Wächterfeder kann Kämpfe derzeit indirekt über XP-, HP-, Party-, Gebiets- und Actor-Zustände erkennen. Ein vollständiger Live-Combat-Logger ist deshalb als optionale Laufzeit-Erweiterung vorgesehen und soll getrennt vom read-only Save-Parser bleiben.
+Wenn EEex im EET-Spielordner installiert ist, kann Wächterfeder zusätzlich einen kleinen Laufzeit-Logger installieren:
+
+```text
+EET Combatlogger installieren.cmd
+```
+
+Der Installer verwendet den lokal gespeicherten EET-Spielpfad und legt genau eine Modder-Lua-Datei an:
+
+```text
+<BG2EE>\override\M_WFLOG.lua
+```
+
+Das entspricht dem von EEex vorgesehenen `M_*.lua`-Mechanismus. Die Datei verändert keinen Quest- oder Savezustand. Sie hängt sich an die vorhandenen EEex-Damage-Hooks und schreibt nur lokale JSON-Zeilen nach:
+
+```text
+.wachterfeder/eet/runtime/combat.jsonl
+```
+
+Version 1 erfasst:
+
+- tatsächlichen HP-Verlust nach einem EEex-Damage-Effekt,
+- Quelle und Ziel, soweit die Engine sie auflösen kann,
+- HP vor und nach dem Effekt,
+- einen `lethal_candidate`, wenn das Ziel nach dem Effekt bei 0 oder weniger HP steht.
+
+`lethal_candidate` ist bewusst noch kein separat bestätigter Tod. Treffer-/Fehlschlagwürfe, Heilung und eine sichere Todesbestätigung folgen als spätere Logger-Stufen.
+
+### Wichtig beim ersten Einsatz
+
+Nach der Logger-Installation einmal **vor der nächsten Spielsitzung** im EET-Tab `Baldur's Gate auswerten` drücken. Dadurch setzt Wächterfeder den Cursor für das Laufzeitlog. Erst danach werden neu angehängte Kampfereignisse als Session-Delta übernommen.
+
+EET weiterhin ausschließlich über `InfinityLoader.exe` starten.
+
+Die neue Delta-Ausgabe ergänzt unter `summary` unter anderem:
+
+```text
+combat_events
+combat_damage_events
+combat_damage_total
+combat_lethal_candidates
+combat_logger_errors
+```
+
+und unter `changes`:
+
+```text
+combat_log
+```
+
+Damit bleiben die Rohdaten lokal und nur die neuen Kampfereignisse einer Session landen in `eet.delta.json`.
 
 ## Aussagekraft
 
