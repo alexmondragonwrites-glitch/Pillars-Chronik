@@ -151,6 +151,79 @@ def _augment_party_runtime(delta: JsonObject, previous: Mapping[str, Any] | None
         summary["has_changes"] = True
 
 
+def _globals(snapshot: Mapping[str, Any] | None) -> Mapping[str, Any]:
+    value = (snapshot or {}).get("global_variables", {})
+    return value if isinstance(value, Mapping) else {}
+
+
+def _global_int(snapshot: Mapping[str, Any] | None, name: str, default: int = 0) -> int:
+    try:
+        return int(_globals(snapshot).get(name, default) or 0)
+    except (TypeError, ValueError):
+        return default
+
+
+def _save_telemetry(previous: Mapping[str, Any] | None, current: Mapping[str, Any]) -> tuple[JsonObject, list[JsonObject]]:
+    """Decode V7 WF_* integer globals into runtime events.
+
+    V7 intentionally persists only the latest raw dialogue arguments. If more
+    than one choice occurred between saves, the sequence delta tells us how many
+    choices happened while the payload describes only the most recent one.
+    """
+    version = _global_int(current, "WF_RUNTIME_VERSION", 0)
+    boot = _global_int(current, "WF_RUNTIME_BOOT_SEQ", 0)
+    old_boot = _global_int(previous, "WF_RUNTIME_BOOT_SEQ", 0)
+    hook = _global_int(current, "WF_DIALOG_HOOK", 0)
+    seq = _global_int(current, "WF_DIALOG_SEQ", 0)
+    old_seq = _global_int(previous, "WF_DIALOG_SEQ", 0)
+    choices = max(0, seq - old_seq)
+
+    report: JsonObject = {
+        "schema_version": 1,
+        "mode": "save_globals",
+        "runtime_version": version,
+        "runtime_active": version >= 7,
+        "boot_seq": boot,
+        "booted_since_previous": boot > old_boot,
+        "dialog_hook_available": hook == 1,
+        "dialog_seq": seq,
+        "dialog_choices_since_previous": choices,
+        "last_choice_only": choices > 1,
+    }
+
+    events: list[JsonObject] = []
+    if version >= 7 and boot > old_boot:
+        events.append(
+            {
+                "schema_version": 7,
+                "event": "runtime_start",
+                "source": "save_globals",
+                "seq": boot,
+                "dialogue_hook": hook == 1,
+            }
+        )
+
+    if choices > 0:
+        event: JsonObject = {
+            "schema_version": 7,
+            "event": "dialogue_choice",
+            "source": "save_globals",
+            "seq": seq,
+            "choices_since_previous": choices,
+            "last_choice_only": choices > 1,
+            "arg_count": _global_int(current, "WF_DIALOG_ARGC", 0),
+            "game_ticks": _global_int(current, "WF_DIALOG_TICKS", -1),
+        }
+        for index in range(1, 5):
+            is_number = _global_int(current, f"WF_DLG_A{index}_NUM", 0) == 1
+            event[f"arg{index}_numeric"] = is_number
+            event[f"arg{index}"] = _global_int(current, f"WF_DLG_A{index}", 0) if is_number else None
+        events.append(event)
+        report["last_dialogue_choice"] = event
+
+    return report, events
+
+
 def _augment_runtime(delta: JsonObject, events: list[JsonObject], *, initial_runtime_baseline: bool) -> None:
     summary = delta.setdefault("summary", {})
     changes = delta.setdefault("changes", {})
@@ -175,17 +248,16 @@ def _augment_runtime(delta: JsonObject, events: list[JsonObject], *, initial_run
     changes["live_dialogue_choices"] = dialogue_choices
     changes["runtime_diagnostics"] = diagnostic_events
 
-    # Heartbeats alone are diagnostics, not story/gameplay changes.
     if damage_events or dialogue_choices:
         summary["has_changes"] = True
 
     if initial_runtime_baseline:
         notes.append(
-            "Runtime-Logger: erste Laufzeit-Basis erstellt; vorhandene ältere Logzeilen wurden nicht als neue Session-Ereignisse übernommen."
+            "Legacy-Dateilog: erste Laufzeit-Basis erstellt; ältere Logzeilen wurden nicht als neue Session-Ereignisse übernommen."
         )
     notes.append(
-        "Runtime-Logger V3 beobachtet EEex-Damage-Effekte und tatsächliche Aufrufe von Infinity_SelectDialogueOption. "
-        "Dialogargumente werden zunächst roh protokolliert und erst nach bestätigter Zuordnung als konkrete Antwort interpretiert."
+        "EEex V7 verwendet sichere WF_*-Save-Telemetrie statt CLUA/Dateilogging. "
+        "Bei mehreren Dialogwahlen zwischen zwei Saves bleibt der Zähler exakt, die Rohargumente gehören jedoch nur zur letzten Wahl."
     )
 
 
@@ -238,6 +310,10 @@ def analyse_session(
     delta = _read_json(result.delta_path)
     _augment_party_runtime(delta, previous_snapshot or None, current_snapshot)
 
+    telemetry_report, telemetry_events = _save_telemetry(previous_snapshot or None, current_snapshot)
+    delta.setdefault("changes", {})["runtime_save_telemetry"] = telemetry_report
+    delta.setdefault("summary", {})["runtime_save_telemetry_active"] = bool(telemetry_report.get("runtime_active"))
+
     status = None
     if resolved_game is not None:
         try:
@@ -245,32 +321,39 @@ def analyse_session(
         except (OSError, EetError):
             status = None
 
+    # Keep the old file reader for users who still have V3-V6 lines, but V7
+    # itself does not create or depend on this file.
     log_path = status.log_path if status is not None else runtime_log_path(root)
     had_cursor, start_offset = _read_cursor(root)
     if had_cursor:
-        events, metadata = read_new_events(log_path, start_offset)
+        legacy_events, metadata = read_new_events(log_path, start_offset)
     else:
-        events = []
+        legacy_events = []
         metadata = log_metadata(log_path)
         metadata["malformed_lines"] = 0
+    events = telemetry_events + legacy_events
     _augment_runtime(delta, events, initial_runtime_baseline=not had_cursor)
 
     if resolved_game is not None:
         _augment_dialogues(delta, game_path=resolved_game, language=language)
 
+    runtime_active = bool(telemetry_report.get("runtime_active"))
     current_snapshot["runtime_combat"] = {
-        "schema_version": 3,
+        "schema_version": 4,
         "eeex_available": bool(status and status.eeex_available),
         "logger_installed": bool(status and status.installed),
         "logger_up_to_date": bool(status and status.up_to_date),
-        "runtime_active": bool(status and status.runtime_active),
-        # Backward-compatible alias. In V3 enabled means installed+current;
-        # runtime_active is the stronger proof that a heartbeat was observed.
+        "runtime_active": runtime_active,
         "enabled": bool(status and status.up_to_date),
-        "log_exists": bool(metadata.get("exists")),
-        "log_name": log_path.name,
-        "cursor": int(metadata.get("cursor", 0) or 0),
-        "size": int(metadata.get("size", 0) or 0),
+        "telemetry_mode": "save_globals" if runtime_active else "not_confirmed",
+        "runtime_version": telemetry_report.get("runtime_version", 0),
+        "boot_seq": telemetry_report.get("boot_seq", 0),
+        "dialog_hook_available": telemetry_report.get("dialog_hook_available", False),
+        "dialog_seq": telemetry_report.get("dialog_seq", 0),
+        "legacy_log_exists": bool(metadata.get("exists")),
+        "legacy_log_name": log_path.name,
+        "legacy_log_cursor": int(metadata.get("cursor", 0) or 0),
+        "legacy_log_size": int(metadata.get("size", 0) or 0),
         "malformed_lines_since_previous": int(metadata.get("malformed_lines", 0) or 0),
     }
     _write_json(result.snapshot_path, current_snapshot)
