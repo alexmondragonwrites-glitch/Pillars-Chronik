@@ -1,25 +1,30 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-$roots = @(
-    Join-Path $env:USERPROFILE "Documents\Baldur's Gate - Enhanced Edition Trilogy\save",
-    Join-Path $env:USERPROFILE "Documents\Baldur's Gate - Enhanced Edition Trilogy\mpsave",
-    Join-Path $env:USERPROFILE "Documents\Baldur's Gate II - Enhanced Edition\save",
-    Join-Path $env:USERPROFILE "Documents\Baldur's Gate II - Enhanced Edition\mpsave"
-)
-
+$documentRoots = @()
+$knownDocuments = [Environment]::GetFolderPath('MyDocuments')
+if ($knownDocuments) {
+    $documentRoots += $knownDocuments
+}
+$documentRoots += (Join-Path $env:USERPROFILE "Documents")
 if ($env:OneDrive) {
+    $documentRoots += (Join-Path $env:OneDrive "Documents")
+}
+$documentRoots = $documentRoots | Where-Object { $_ } | Select-Object -Unique
+
+$roots = @()
+foreach ($documents in $documentRoots) {
     $roots += @(
-        Join-Path $env:OneDrive "Documents\Baldur's Gate - Enhanced Edition Trilogy\save",
-        Join-Path $env:OneDrive "Documents\Baldur's Gate - Enhanced Edition Trilogy\mpsave",
-        Join-Path $env:OneDrive "Documents\Baldur's Gate II - Enhanced Edition\save",
-        Join-Path $env:OneDrive "Documents\Baldur's Gate II - Enhanced Edition\mpsave"
+        Join-Path $documents "Baldur's Gate - Enhanced Edition Trilogy\save",
+        Join-Path $documents "Baldur's Gate - Enhanced Edition Trilogy\mpsave",
+        Join-Path $documents "Baldur's Gate II - Enhanced Edition\save",
+        Join-Path $documents "Baldur's Gate II - Enhanced Edition\mpsave"
     )
 }
-
 $roots = $roots | Select-Object -Unique
 $found = @()
 
 Write-Host "Wächterfeder sucht nach EET-Spielständen ..." -ForegroundColor Cyan
+Write-Host "Windows-Dokumente: $knownDocuments" -ForegroundColor DarkGray
 Write-Host ""
 
 foreach ($root in $roots) {
@@ -34,13 +39,7 @@ foreach ($root in $roots) {
 if (-not $found) {
     Write-Host ""
     Write-Host "Kein BALDUR.GAM in den Standardordnern gefunden. Suche breiter unter Dokumente ..." -ForegroundColor Yellow
-    $documentRoots = @(
-        (Join-Path $env:USERPROFILE "Documents")
-    )
-    if ($env:OneDrive) {
-        $documentRoots += (Join-Path $env:OneDrive "Documents")
-    }
-    foreach ($root in ($documentRoots | Select-Object -Unique)) {
+    foreach ($root in $documentRoots) {
         if (Test-Path $root) {
             $found += Get-ChildItem -Path $root -Filter BALDUR.GAM -File -Recurse
         }
