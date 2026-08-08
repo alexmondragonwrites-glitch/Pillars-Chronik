@@ -1,20 +1,21 @@
 -- WACHTERFEDER_EET_COMBAT_LOGGER_V1
 -- WACHTERFEDER_EEEX_SAFE_LOGGING_V2
 -- WACHTERFEDER_EET_RUNTIME_LOGGER_V3
+-- WACHTERFEDER_EET_RUNTIME_LOGGER_V4
 -- Generated into the local EET override folder by Wächterfeder.
 -- Read-only towards game state: this script observes EEex/engine events and
 -- emits prefixed lines through the engine-supported logging channel.
 --
--- V3 deliberately does NOT use Lua io.*. EEex Minimal / EE Lua may omit the
--- standard io library. C:LogSet + C:LogMessages are the supported Beamdog
--- logging path. A relative filename is intentional: the engine owns the log
--- destination and Wächterfeder reads the resulting local file afterwards.
+-- V4 deliberately waits for EEex_GameState_AddInitializedListener() before it
+-- registers observers or writes a heartbeat. This avoids touching CLUA/engine
+-- facilities while the Lua environment is still being assembled.
 
-local WF_LOG_FILE = [[Wachterfeder-runtime.log]]
+local WF_LOG_PATH = [[__WACHTERFEDER_LOG_PATH__]]
 local WF_PREFIX = "WFLOG|"
 local WF_SEQ = 0
 local WF_START_HP = {}
 local WF_ENGINE_LOG_READY = false
+local WF_OBSERVERS_INSTALLED = false
 
 local function wf_escape(value)
     local text = tostring(value or "")
@@ -66,7 +67,7 @@ local function wf_prepare_engine_log()
     if WF_ENGINE_LOG_READY then return true end
     local ok = pcall(function()
         if C == nil then error("CLUAConsole unavailable") end
-        C:LogSet(WF_LOG_FILE)
+        C:LogSet(WF_LOG_PATH)
         C:LogMessages()
     end)
     WF_ENGINE_LOG_READY = ok
@@ -75,20 +76,27 @@ end
 
 local function wf_append(line)
     if not wf_prepare_engine_log() then return false end
-    return pcall(function()
-        local payload = WF_PREFIX .. line
-        if type(Infinity_Log) == "function" then
-            Infinity_Log(payload)
-        else
-            print(payload)
-        end
-    end)
+    local payload = WF_PREFIX .. line
+    local wrote = false
+
+    -- C:LogMessages() + C:LogSet() control the engine/console logging stream.
+    -- Lua print is the least-assumptive producer for that stream.
+    local print_ok = pcall(function() print(payload) end)
+    wrote = wrote or print_ok
+
+    -- Some EE builds expose Infinity_Log as an additional logging entry point.
+    -- Emit there as well; the Python reader de-duplicates identical seq values.
+    if type(Infinity_Log) == "function" then
+        local infinity_ok = pcall(function() Infinity_Log(payload) end)
+        wrote = wrote or infinity_ok
+    end
+    return wrote
 end
 
 local function wf_emit(kind, fields)
     WF_SEQ = WF_SEQ + 1
     local parts = {
-        '{"schema_version":3',
+        '{"schema_version":4',
         ',"event":"' .. wf_escape(kind) .. '"',
         ',"seq":' .. tostring(WF_SEQ)
     }
@@ -108,88 +116,98 @@ local function wf_emit(kind, fields)
     pcall(function() wf_append(table.concat(parts)) end)
 end
 
--- -------------------------------------------------------------------------
--- Dialogue observation
--- -------------------------------------------------------------------------
--- Infinity_SelectDialogueOption is the engine/UI entry point used when the
--- player selects a dialogue response. We preserve the original function and
--- only record the arguments before delegating to it.
-local WF_ORIGINAL_SELECT_DIALOGUE_OPTION = Infinity_SelectDialogueOption
-if type(WF_ORIGINAL_SELECT_DIALOGUE_OPTION) == "function" then
-    function Infinity_SelectDialogueOption(...)
-        local args = {...}
-        wf_emit("dialogue_choice", {
-            {"arg_count", #args, "number"},
-            {"arg1", args[1], "string"},
-            {"arg2", args[2], "string"},
-            {"arg3", args[3], "string"},
-            {"arg4", args[4], "string"},
-            {"selected_character", wf_safe_call("Infinity_GetSelectedCharacterName", ""), "string"},
-            {"screen", wf_safe_call("Infinity_GetCurrentScreenName", ""), "string"},
-            {"game_ticks", wf_safe_call("Infinity_GetGameTicks", -1), "number"}
+local function wf_install_observers()
+    if WF_OBSERVERS_INSTALLED then return end
+    WF_OBSERVERS_INSTALLED = true
+
+    -- ---------------------------------------------------------------------
+    -- Dialogue observation
+    -- ---------------------------------------------------------------------
+    local original_select_dialogue_option = Infinity_SelectDialogueOption
+    local dialogue_hook_available = type(original_select_dialogue_option) == "function"
+    if dialogue_hook_available then
+        function Infinity_SelectDialogueOption(...)
+            local args = {...}
+            wf_emit("dialogue_choice", {
+                {"arg_count", #args, "number"},
+                {"arg1", args[1], "string"},
+                {"arg2", args[2], "string"},
+                {"arg3", args[3], "string"},
+                {"arg4", args[4], "string"},
+                {"selected_character", wf_safe_call("Infinity_GetSelectedCharacterName", ""), "string"},
+                {"screen", wf_safe_call("Infinity_GetCurrentScreenName", ""), "string"},
+                {"game_ticks", wf_safe_call("Infinity_GetGameTicks", -1), "number"}
+            })
+            return original_select_dialogue_option(...)
+        end
+    else
+        wf_emit("logger_error", {
+            {"reason", "dialogue_choice_function_unavailable", "string"}
         })
-        return WF_ORIGINAL_SELECT_DIALOGUE_OPTION(...)
-    end
-else
-    wf_emit("logger_error", {
-        {"reason", "dialogue_choice_function_unavailable", "string"}
-    })
-end
-
--- -------------------------------------------------------------------------
--- Combat observation
--- -------------------------------------------------------------------------
--- EEex's Sprite patch calls these Lua hook names around Opcode #12 damage
--- calculations. Preserve EEex's implementation and add a read-only observer.
-local WF_ORIGINAL_DAMAGE_START = EEex_Sprite_Hook_OnDamageEffectStartingCalculations
-local WF_ORIGINAL_DAMAGE_DONE = EEex_Sprite_Hook_OnDamageEffectDone
-
-if type(WF_ORIGINAL_DAMAGE_START) == "function" and type(WF_ORIGINAL_DAMAGE_DONE) == "function" then
-    function EEex_Sprite_Hook_OnDamageEffectStartingCalculations(effect, sourceSprite, targetSprite)
-        local target_id = wf_sprite_id(targetSprite)
-        local hp = wf_hp(targetSprite)
-        if target_id ~= -1 and hp ~= nil then
-            WF_START_HP[target_id] = hp
-        end
-        return WF_ORIGINAL_DAMAGE_START(effect, sourceSprite, targetSprite)
     end
 
-    function EEex_Sprite_Hook_OnDamageEffectDone(effect, sourceSprite, targetSprite)
-        local result = WF_ORIGINAL_DAMAGE_DONE(effect, sourceSprite, targetSprite)
-        local target_id = wf_sprite_id(targetSprite)
-        local before = WF_START_HP[target_id]
-        local after = wf_hp(targetSprite)
-        WF_START_HP[target_id] = nil
+    -- ---------------------------------------------------------------------
+    -- Combat observation
+    -- ---------------------------------------------------------------------
+    local original_damage_start = EEex_Sprite_Hook_OnDamageEffectStartingCalculations
+    local original_damage_done = EEex_Sprite_Hook_OnDamageEffectDone
+    local damage_hook_available = type(original_damage_start) == "function" and type(original_damage_done) == "function"
 
-        if before ~= nil and after ~= nil then
-            local damage = before - after
-            if damage > 0 then
-                wf_emit("damage", {
-                    {"source", wf_sprite_name(sourceSprite), "string"},
-                    {"source_id", wf_sprite_id(sourceSprite), "number"},
-                    {"target", wf_sprite_name(targetSprite), "string"},
-                    {"target_id", target_id, "number"},
-                    {"damage", damage, "number"},
-                    {"hp_before", before, "number"},
-                    {"hp_after", after, "number"},
-                    {"lethal_candidate", after <= 0, "boolean"},
-                    {"game_ticks", wf_safe_call("Infinity_GetGameTicks", -1), "number"}
-                })
+    if damage_hook_available then
+        function EEex_Sprite_Hook_OnDamageEffectStartingCalculations(effect, sourceSprite, targetSprite)
+            local target_id = wf_sprite_id(targetSprite)
+            local hp = wf_hp(targetSprite)
+            if target_id ~= -1 and hp ~= nil then
+                WF_START_HP[target_id] = hp
             end
+            return original_damage_start(effect, sourceSprite, targetSprite)
         end
-        return result
+
+        function EEex_Sprite_Hook_OnDamageEffectDone(effect, sourceSprite, targetSprite)
+            local result = original_damage_done(effect, sourceSprite, targetSprite)
+            local target_id = wf_sprite_id(targetSprite)
+            local before = WF_START_HP[target_id]
+            local after = wf_hp(targetSprite)
+            WF_START_HP[target_id] = nil
+
+            if before ~= nil and after ~= nil then
+                local damage = before - after
+                if damage > 0 then
+                    wf_emit("damage", {
+                        {"source", wf_sprite_name(sourceSprite), "string"},
+                        {"source_id", wf_sprite_id(sourceSprite), "number"},
+                        {"target", wf_sprite_name(targetSprite), "string"},
+                        {"target_id", target_id, "number"},
+                        {"damage", damage, "number"},
+                        {"hp_before", before, "number"},
+                        {"hp_after", after, "number"},
+                        {"lethal_candidate", after <= 0, "boolean"},
+                        {"game_ticks", wf_safe_call("Infinity_GetGameTicks", -1), "number"}
+                    })
+                end
+            end
+            return result
+        end
+    else
+        wf_emit("logger_error", {
+            {"reason", "damage_hooks_unavailable", "string"}
+        })
     end
-else
-    wf_emit("logger_error", {
-        {"reason", "damage_hooks_unavailable", "string"}
+
+    -- Only emit the heartbeat after the engine is initialized and observers
+    -- have actually been inspected / registered.
+    wf_emit("runtime_start", {
+        {"logger", "Wachterfeder EET Runtime Logger V4", "string"},
+        {"damage_hook", damage_hook_available, "boolean"},
+        {"dialogue_hook", dialogue_hook_available, "boolean"},
+        {"screen", wf_safe_call("Infinity_GetCurrentScreenName", ""), "string"}
     })
 end
 
--- Heartbeat proves that M_WFLOG.lua was executed and that the runtime channel
--- reached the point at which all observers were registered.
-wf_emit("runtime_start", {
-    {"logger", "Wachterfeder EET Runtime Logger V3", "string"},
-    {"damage_hook", type(WF_ORIGINAL_DAMAGE_DONE) == "function", "boolean"},
-    {"dialogue_hook", type(WF_ORIGINAL_SELECT_DIALOGUE_OPTION) == "function", "boolean"},
-    {"screen", wf_safe_call("Infinity_GetCurrentScreenName", ""), "string"}
-})
+if type(EEex_GameState_AddInitializedListener) == "function" then
+    EEex_GameState_AddInitializedListener(wf_install_observers)
+else
+    -- Compatibility fallback. Current EEex provides the initialized listener,
+    -- but an older build should still fail softly rather than blocking startup.
+    wf_install_observers()
+end
