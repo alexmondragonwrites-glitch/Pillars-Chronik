@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from tools.wachterfeder.eet_combat_logger import (
+    ENGINE_LOG_NAME,
     LOGGER_CURRENT_MARKER,
     LOGGER_MARKER,
     LOG_PREFIX,
@@ -15,7 +16,7 @@ from tools.wachterfeder.eet_combat_logger import (
     summarise_events,
     uninstall_logger,
 )
-from tools.wachterfeder.eet_session_runtime import _augment_combat
+from tools.wachterfeder.eet_session_runtime import _augment_runtime
 
 
 class EetCombatLoggerTests(unittest.TestCase):
@@ -32,7 +33,7 @@ class EetCombatLoggerTests(unittest.TestCase):
         template = root / "tools" / "wachterfeder" / "eeex" / "M_WFLOG.lua.template"
         template.parent.mkdir(parents=True)
         template.write_text(
-            f"-- {LOGGER_MARKER}\n-- {LOGGER_CURRENT_MARKER}\nlocal LOG = [[__WACHTERFEDER_LOG_PATH__]]\n",
+            f"-- {LOGGER_MARKER}\n-- {LOGGER_CURRENT_MARKER}\nlocal WF_LOG_FILE = [[{ENGINE_LOG_NAME}]]\n",
             encoding="utf-8",
         )
 
@@ -46,15 +47,27 @@ class EetCombatLoggerTests(unittest.TestCase):
             self.assertTrue(status.installed)
             self.assertTrue(status.up_to_date)
             self.assertTrue(status.eeex_available)
+            self.assertFalse(status.runtime_active)
             self.assertTrue(status.script_path.is_file())
+            self.assertEqual(status.log_path, game.resolve() / ENGINE_LOG_NAME)
+            self.assertTrue(status.log_path.is_file())
+            self.assertEqual(status.log_path.stat().st_size, 0)
             self.assertIn(LOGGER_MARKER, status.script_path.read_text(encoding="utf-8"))
             self.assertIn(LOGGER_CURRENT_MARKER, status.script_path.read_text(encoding="utf-8"))
-            self.assertIn(runtime_log_path(root).as_posix(), status.script_path.read_text(encoding="utf-8"))
+
+            status.log_path.write_text(
+                LOG_PREFIX + '{"schema_version":3,"event":"runtime_start","seq":1}\n',
+                encoding="utf-8",
+            )
+            heartbeat_status = logger_status(game, root=root)
+            self.assertTrue(heartbeat_status.runtime_active)
 
             status = uninstall_logger(game, root=root)
             self.assertFalse(status.installed)
             self.assertFalse(status.up_to_date)
+            self.assertFalse(status.runtime_active)
             self.assertFalse((game / "override" / "M_WFLOG.lua").exists())
+            self.assertFalse((game / ENGINE_LOG_NAME).exists())
 
     def test_status_marks_legacy_logger_as_outdated(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -66,23 +79,27 @@ class EetCombatLoggerTests(unittest.TestCase):
             status = logger_status(game, root=root)
             self.assertTrue(status.installed)
             self.assertFalse(status.up_to_date)
+            self.assertFalse(status.runtime_active)
 
-    def test_reader_accepts_prefixed_clua_lines_and_ignores_engine_noise(self) -> None:
+    def test_reader_accepts_prefixed_engine_lines_and_ignores_noise(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
-            log = Path(temporary) / "combat.jsonl"
+            log = Path(temporary) / ENGINE_LOG_NAME
             log.write_text("old engine output\n", encoding="utf-8")
             offset = log.stat().st_size
             with log.open("a", encoding="utf-8") as handle:
-                handle.write('Some engine prefix ' + LOG_PREFIX + '{"event":"damage","damage":7,"lethal_candidate":false}\n')
+                handle.write('Some engine prefix ' + LOG_PREFIX + '{"event":"runtime_start"}\n')
                 handle.write('ordinary unrelated engine line\n')
                 handle.write(LOG_PREFIX + '{"event":"damage","damage":5,"lethal_candidate":true}\n')
+                handle.write(LOG_PREFIX + '{"event":"dialogue_choice","arg1":"2"}\n')
 
             events, metadata = read_new_events(log, offset)
-            self.assertEqual(len(events), 2)
+            self.assertEqual(len(events), 3)
             self.assertEqual(metadata["malformed_lines"], 0)
             summary = summarise_events(events)
-            self.assertEqual(summary["damage_total"], 12)
+            self.assertEqual(summary["damage_total"], 5)
             self.assertEqual(summary["lethal_candidates"], 1)
+            self.assertEqual(summary["runtime_starts"], 1)
+            self.assertEqual(summary["dialogue_choices"], 1)
 
     def test_reader_keeps_legacy_bare_json_support(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -91,34 +108,41 @@ class EetCombatLoggerTests(unittest.TestCase):
             events, metadata = read_new_events(log, 0)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0]["damage"], 3)
-            # Unprefixed engine/noise lines are ignored rather than treated as logger corruption.
             self.assertEqual(metadata["malformed_lines"], 0)
 
-    def test_real_template_does_not_assume_lua_io_exists(self) -> None:
+    def test_real_template_uses_engine_logging_and_observes_dialogue(self) -> None:
         template = Path(__file__).resolve().parents[1] / "eeex" / "M_WFLOG.lua.template"
         text = template.read_text(encoding="utf-8")
         self.assertIn(LOGGER_CURRENT_MARKER, text)
-        self.assertIn('type(io) == "table"', text)
-        self.assertIn("C:LogSet(WF_LOG_PATH)", text)
+        self.assertNotIn("io.open", text)
+        self.assertIn("C:LogSet(WF_LOG_FILE)", text)
         self.assertIn("C:LogMessages()", text)
         self.assertIn("Infinity_Log", text)
-        self.assertIn("pcall(function() wf_append", text)
+        self.assertIn("WF_ORIGINAL_SELECT_DIALOGUE_OPTION", text)
+        self.assertIn('wf_emit("dialogue_choice"', text)
+        self.assertIn('wf_emit("runtime_start"', text)
+        self.assertIn("EEex_Sprite_Hook_OnDamageEffectDone", text)
 
-    def test_delta_augmentation_keeps_combat_events_compact(self) -> None:
+    def test_runtime_augmentation_splits_combat_and_dialogue_events(self) -> None:
         delta = {"summary": {"has_changes": False}, "changes": {}, "notes": []}
         events = [
+            {"event": "runtime_start", "logger": "V3"},
             {
                 "event": "damage",
                 "source": "Kivan",
                 "target": "Hobgoblin",
                 "damage": 9,
                 "lethal_candidate": True,
-            }
+            },
+            {"event": "dialogue_choice", "arg1": "2", "selected_character": "Sephira"},
         ]
-        _augment_combat(delta, events, initial_runtime_baseline=False)
+        _augment_runtime(delta, events, initial_runtime_baseline=False)
         self.assertTrue(delta["summary"]["has_changes"])
         self.assertEqual(delta["summary"]["combat_damage_total"], 9)
+        self.assertEqual(delta["summary"]["live_dialogue_choices"], 1)
+        self.assertEqual(delta["summary"]["runtime_starts"], 1)
         self.assertEqual(delta["changes"]["combat_log"][0]["source"], "Kivan")
+        self.assertEqual(delta["changes"]["live_dialogue_choices"][0]["arg1"], "2")
 
 
 if __name__ == "__main__":
