@@ -1,10 +1,17 @@
 -- WACHTERFEDER_EET_COMBAT_LOGGER_V1
+-- WACHTERFEDER_EEEX_SAFE_LOGGING_V2
 -- Generated into the local EET override folder by Wächterfeder.
--- Read-only towards game state: this script only appends JSON lines to LOG_PATH.
+-- Read-only towards game state: this script only emits prefixed runtime log lines.
+--
+-- Beamdog's normal EE Lua environment does not guarantee that the standard
+-- Lua io library is exposed. Prefer io.open when it exists; otherwise use the
+-- engine-supported CLUA logging path (C:LogSet + C:LogMessages + Infinity_Log).
 
 local WF_LOG_PATH = [[__WACHTERFEDER_LOG_PATH__]]
+local WF_PREFIX = "WFLOG|"
 local WF_SEQ = 0
 local WF_START_HP = {}
+local WF_ENGINE_LOG_READY = false
 
 local function wf_escape(value)
     local text = tostring(value or "")
@@ -44,13 +51,46 @@ local function wf_hp(sprite)
     return nil
 end
 
+local function wf_prepare_engine_log()
+    if WF_ENGINE_LOG_READY then return true end
+    local ok = pcall(function()
+        if C == nil then error("CLUAConsole unavailable") end
+        C:LogSet(WF_LOG_PATH)
+        C:LogMessages()
+    end)
+    WF_ENGINE_LOG_READY = ok
+    return ok
+end
+
 local function wf_append(line)
-    local file = io.open(WF_LOG_PATH, "a")
-    if file == nil then return end
-    file:write(line)
-    file:write("\n")
-    file:flush()
-    file:close()
+    -- Some EEex configurations expose the normal Lua io library. Use it when
+    -- present, but never assume it exists.
+    if type(io) == "table" and type(io.open) == "function" then
+        local ok = pcall(function()
+            local file = io.open(WF_LOG_PATH, "a")
+            if file == nil then return end
+            file:write(WF_PREFIX)
+            file:write(line)
+            file:write("\n")
+            file:flush()
+            file:close()
+        end)
+        if ok then return true end
+    end
+
+    -- Minimal EEex / normal EE Lua: route a uniquely-prefixed line through the
+    -- engine logger. Wächterfeder filters everything except WFLOG| lines.
+    if wf_prepare_engine_log() then
+        local ok = pcall(function()
+            if type(Infinity_Log) == "function" then
+                Infinity_Log(WF_PREFIX .. line)
+            else
+                print(WF_PREFIX .. line)
+            end
+        end)
+        return ok
+    end
+    return false
 end
 
 local function wf_emit(kind, fields)
@@ -73,7 +113,8 @@ local function wf_emit(kind, fields)
         end
     end
     table.insert(parts, "}")
-    wf_append(table.concat(parts))
+    -- Never let logger I/O abort EEex/game startup.
+    pcall(function() wf_append(table.concat(parts)) end)
 end
 
 local WF_ORIGINAL_DAMAGE_START = EEex_Sprite_Hook_OnDamageEffectStartingCalculations
