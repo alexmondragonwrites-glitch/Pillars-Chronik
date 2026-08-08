@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Install the optional Wächterfeder EEex save-telemetry observer.
 
-V7 no longer relies on native UI diagnostics, CLUAConsole logging, or direct
+V7.1 no longer relies on native UI diagnostics, console logging, or direct
 file I/O from Lua. The installed ``M_WFLOG.lua`` writes only namespaced WF_*
 integer GLOBAL values into the next save. The normal EET save parser reads
 those values afterwards. Legacy log-reader helpers remain for old snapshots.
@@ -21,7 +21,7 @@ except ModuleNotFoundError:  # direct execution from tools/wachterfeder
 
 JsonObject = dict[str, Any]
 LOGGER_MARKER = "WACHTERFEDER_EET_COMBAT_LOGGER_V1"
-LOGGER_CURRENT_MARKER = "WACHTERFEDER_EET_SAVE_TELEMETRY_V7"
+LOGGER_CURRENT_MARKER = "WACHTERFEDER_EET_SAVE_TELEMETRY_V7_1"
 LOGGER_SCRIPT_NAME = "M_WFLOG.lua"
 ENGINE_LOG_NAME = "Wachterfeder-runtime.log"  # legacy V3-V6 file
 TEMPLATE_RELATIVE = Path("tools/wachterfeder/eeex/M_WFLOG.lua.template")
@@ -59,7 +59,7 @@ def _eeex_available(game_root: Path) -> bool:
 
 
 def _runtime_has_heartbeat(log_path: Path) -> bool:
-    """Legacy V3-V6 heartbeat detector. V7 activity is proved by save globals."""
+    """Legacy V3-V6 heartbeat detector. V7+ activity is proved by save globals."""
     try:
         if not log_path.is_file() or log_path.stat().st_size <= 0:
             return False
@@ -85,7 +85,7 @@ def logger_status(game_path: Path, *, root: Path | None = None, language: str = 
         eeex_available=_eeex_available(assets.game_root),
         installed=installed,
         up_to_date=up_to_date,
-        # V7 intentionally has no live file heartbeat. Activity is confirmed
+        # V7+ intentionally has no live file heartbeat. Activity is confirmed
         # after saving, via WF_RUNTIME_VERSION / WF_RUNTIME_BOOT_SEQ.
         runtime_active=False,
         script_path=script,
@@ -95,8 +95,6 @@ def logger_status(game_path: Path, *, root: Path | None = None, language: str = 
 
 def _render_template(log_path: Path, *, root: Path) -> str:
     template = (root / TEMPLATE_RELATIVE).read_text(encoding="utf-8")
-    # Placeholder replacement is retained so old/custom templates remain
-    # installable, although the V7 template contains no log path.
     portable = log_path.resolve().as_posix()
     return template.replace("__WACHTERFEDER_LOG_PATH__", portable)
 
@@ -121,8 +119,6 @@ def install_logger(game_path: Path, *, root: Path | None = None, language: str =
     script.parent.mkdir(parents=True, exist_ok=True)
     script.write_text(_render_template(log_path, root=root), encoding="utf-8")
 
-    # Remove the obsolete Wächterfeder-owned V3-V6 log so the UI cannot mistake
-    # stale bytes for current V7 activity.
     try:
         if log_path.exists():
             log_path.unlink()
@@ -132,7 +128,7 @@ def install_logger(game_path: Path, *, root: Path | None = None, language: str =
     status = logger_status(assets.game_root, root=root, language=language)
     if not status.up_to_date:
         raise EetError(
-            "Die EEex-Save-Telemetrie wurde geschrieben, aber V7 konnte danach nicht bestätigt werden."
+            "Die EEex-Save-Telemetrie wurde geschrieben, aber V7.1 konnte danach nicht bestätigt werden."
         )
     return status
 
