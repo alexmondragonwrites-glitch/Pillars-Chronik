@@ -117,6 +117,8 @@ class EetCombatLoggerTests(unittest.TestCase):
         self.assertIn('wf_set_int("WF_DIALOG_SEQ"', text)
         self.assertIn("Infinity_SelectDialogueOption", text)
         self.assertIn("EEex_GameState_AddInitializedListener", text)
+        self.assertIn("pcall(wf_capture_dialogue_choice, ...)", text)
+        self.assertNotIn("pcall(function() wf_capture_dialogue_choice(...) end)", text)
 
     def test_runtime_augmentation_accepts_save_global_events(self) -> None:
         delta = {"summary": {"has_changes": False}, "changes": {}, "notes": []}
