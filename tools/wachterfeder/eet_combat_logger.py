@@ -2,7 +2,7 @@
 """Install and read the optional Wächterfeder EEex combat logger.
 
 The logger is intentionally tiny and local-only. It installs one ``M_*.lua``
-file into the EET override folder and writes runtime JSONL below the ignored
+file into the EET override folder and writes runtime data below the ignored
 ``.wachterfeder/eet/runtime`` directory. It never changes savegame state.
 """
 from __future__ import annotations
@@ -22,6 +22,7 @@ JsonObject = dict[str, Any]
 LOGGER_MARKER = "WACHTERFEDER_EET_COMBAT_LOGGER_V1"
 LOGGER_SCRIPT_NAME = "M_WFLOG.lua"
 TEMPLATE_RELATIVE = Path("tools/wachterfeder/eeex/M_WFLOG.lua.template")
+LOG_PREFIX = "WFLOG|"
 
 
 @dataclass(frozen=True)
@@ -91,6 +92,8 @@ def install_logger(game_path: Path, *, root: Path | None = None, language: str =
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_path.touch(exist_ok=True)
     script.parent.mkdir(parents=True, exist_ok=True)
+    # Reinstalling is intentionally an in-place upgrade of Wächterfeder's own
+    # script. This is how fixes to the Lua runtime logger reach an existing setup.
     script.write_text(_render_template(log_path, root=root), encoding="utf-8")
     return logger_status(assets.game_root, root=root, language=language)
 
@@ -122,6 +125,33 @@ def log_metadata(log_path: Path) -> JsonObject:
     }
 
 
+def _decode_log_line(raw_line: bytes) -> str:
+    try:
+        return raw_line.decode("utf-8")
+    except UnicodeDecodeError:
+        return raw_line.decode("cp1252", errors="replace")
+
+
+def _json_payload_from_log_line(raw_line: bytes) -> tuple[str | None, bool]:
+    """Return a JSON payload and whether the line belongs to Wächterfeder.
+
+    EEex Minimal does not necessarily expose Lua's ``io`` library. In that
+    environment the Lua logger uses CLUAConsole logging, which can include
+    unrelated engine lines and formatting around our message. Only text after
+    the unique ``WFLOG|`` marker is parsed. Bare JSON remains supported for
+    older logger versions that wrote directly via ``io.open``.
+    """
+    text = _decode_log_line(raw_line).strip()
+    if not text:
+        return None, False
+    marker = text.find(LOG_PREFIX)
+    if marker >= 0:
+        return text[marker + len(LOG_PREFIX) :].strip(), True
+    if text.startswith("{"):
+        return text, True
+    return None, False
+
+
 def read_new_events(log_path: Path, start_offset: int) -> tuple[list[JsonObject], JsonObject]:
     try:
         size = log_path.stat().st_size
@@ -129,6 +159,7 @@ def read_new_events(log_path: Path, start_offset: int) -> tuple[list[JsonObject]
         return [], {"exists": False, "cursor": 0, "size": 0, "malformed_lines": 0}
 
     offset = max(0, int(start_offset or 0))
+    # Engine logging may recreate/truncate the log on a new game launch.
     if offset > size:
         offset = 0
 
@@ -140,11 +171,17 @@ def read_new_events(log_path: Path, start_offset: int) -> tuple[list[JsonObject]
         cursor = handle.tell()
 
     for raw_line in payload.splitlines():
-        if not raw_line.strip():
+        json_text, belongs_to_wachterfeder = _json_payload_from_log_line(raw_line)
+        if not belongs_to_wachterfeder:
+            # CLUAConsole may put unrelated engine messages into the same file.
+            # They are intentionally ignored rather than counted as logger errors.
+            continue
+        if not json_text:
+            malformed += 1
             continue
         try:
-            item = json.loads(raw_line.decode("utf-8"))
-        except (UnicodeDecodeError, json.JSONDecodeError):
+            item = json.loads(json_text)
+        except json.JSONDecodeError:
             malformed += 1
             continue
         if isinstance(item, dict):
