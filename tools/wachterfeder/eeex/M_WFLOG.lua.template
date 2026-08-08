@@ -3,14 +3,17 @@
 -- WACHTERFEDER_EET_RUNTIME_LOGGER_V3
 -- WACHTERFEDER_EET_RUNTIME_LOGGER_V4
 -- WACHTERFEDER_EET_RUNTIME_LOGGER_V5
+-- WACHTERFEDER_EET_RUNTIME_LOGGER_V6
 -- Generated into the local EET override folder by Wächterfeder.
--- Read-only towards game state: this script observes EEex/engine events and
--- emits prefixed lines through the engine-supported logging channel.
+-- Read-only towards game state: this script observes EEex/engine events.
 --
--- V5 does not assume that the global CLUA console object `C` exists. In a
--- normal game without Debug Mode it may be absent. Beamdog/EEex exposes the
--- CLUAConsole class itself, so Wächterfeder constructs a private console
--- instance when necessary and uses that only for LogSet()/LogMessages().
+-- V6 adds visible, temporary diagnostics that do not depend on file logging.
+-- They answer three separate questions in one test:
+--   1. Was M_WFLOG.lua executed at all?
+--   2. Did EEex reach the initialized-listener callback?
+--   3. Does Infinity_SelectDialogueOption see a real player dialogue choice?
+-- File logging remains enabled in parallel, but a broken log channel can no
+-- longer hide whether the observer itself is alive.
 
 local WF_LOG_PATH = [[__WACHTERFEDER_LOG_PATH__]]
 local WF_PREFIX = "WFLOG|"
@@ -21,6 +24,7 @@ local WF_OBSERVERS_INSTALLED = false
 local WF_CONSOLE = nil
 local WF_CONSOLE_SOURCE = "none"
 local WF_LOG_FAILURE_SHOWN = false
+local WF_DIAGNOSTIC_VISIBLE = true
 
 local function wf_escape(value)
     local text = tostring(value or "")
@@ -36,6 +40,20 @@ local function wf_number(value, fallback)
     if number == nil then return fallback or -1 end
     return number
 end
+
+local function wf_diag(message)
+    if not WF_DIAGNOSTIC_VISIBLE then return false end
+    if type(Infinity_DisplayString) ~= "function" then return false end
+    local ok = pcall(function()
+        Infinity_DisplayString("[Wächterfeder V6] " .. tostring(message or ""))
+    end)
+    return ok
+end
+
+-- Best-effort proof that the M_ file itself executed. This may be too early for
+-- Infinity_DisplayString on some EE builds; the initialized message below is
+-- the authoritative second-stage check.
+wf_diag("Lua-Datei geladen")
 
 local function wf_sprite_name(sprite)
     if sprite == nil then return "" end
@@ -86,14 +104,10 @@ end
 local function wf_prepare_engine_log()
     if WF_ENGINE_LOG_READY then return true end
 
-    -- Debug Mode creates the traditional global `C`. Use it when available.
     if C ~= nil and wf_try_prepare_console(C, "global_C") then
         return true
     end
 
-    -- In normal play `C` can be nil. CLUAConsole:new() is the documented
-    -- constructor and lets the logger work without changing Baldur.lua or
-    -- enabling cheats/debug mode.
     if CLUAConsole ~= nil then
         local ok, console = pcall(function() return CLUAConsole:new() end)
         if ok and console ~= nil and wf_try_prepare_console(console, "constructed_CLUAConsole") then
@@ -107,11 +121,7 @@ end
 local function wf_show_log_failure_once()
     if WF_LOG_FAILURE_SHOWN then return end
     WF_LOG_FAILURE_SHOWN = true
-    if type(Infinity_DisplayString) == "function" then
-        pcall(function()
-            Infinity_DisplayString("[Wächterfeder] Runtime-Log konnte nicht geöffnet werden.")
-        end)
-    end
+    wf_diag("Dateilog nicht verfügbar, sichtbare Diagnose bleibt aktiv")
 end
 
 local function wf_append(line)
@@ -119,8 +129,6 @@ local function wf_append(line)
     local prepared = wf_prepare_engine_log()
     local wrote = false
 
-    -- Emit to both known Lua/engine logging entry points. Even if LogSet()
-    -- could not be prepared, these calls are harmless and useful for diagnosis.
     local print_ok = pcall(function() print(payload) end)
     wrote = wrote or print_ok
     if type(Infinity_Log) == "function" then
@@ -137,7 +145,7 @@ end
 local function wf_emit(kind, fields)
     WF_SEQ = WF_SEQ + 1
     local parts = {
-        '{"schema_version":5',
+        '{"schema_version":6',
         ',"event":"' .. wf_escape(kind) .. '"',
         ',"seq":' .. tostring(WF_SEQ)
     }
@@ -161,7 +169,6 @@ local function wf_install_observers()
     if WF_OBSERVERS_INSTALLED then return end
     WF_OBSERVERS_INSTALLED = true
 
-    -- Prepare logging first so runtime_start can prove the full channel.
     wf_prepare_engine_log()
 
     -- ---------------------------------------------------------------------
@@ -172,6 +179,10 @@ local function wf_install_observers()
     if dialogue_hook_available then
         function Infinity_SelectDialogueOption(...)
             local args = {...}
+            wf_diag(
+                "Dialogwahl erkannt | arg1=" .. tostring(args[1]) ..
+                " | arg2=" .. tostring(args[2])
+            )
             wf_emit("dialogue_choice", {
                 {"arg_count", #args, "number"},
                 {"arg1", args[1], "string"},
@@ -185,6 +196,7 @@ local function wf_install_observers()
             return original_select_dialogue_option(...)
         end
     else
+        wf_diag("Dialog-Hook NICHT verfügbar")
         wf_emit("logger_error", {
             {"reason", "dialogue_choice_function_unavailable", "string"}
         })
@@ -238,8 +250,14 @@ local function wf_install_observers()
         })
     end
 
+    wf_diag(
+        "EEex initialisiert | Dialog-Hook=" .. (dialogue_hook_available and "JA" or "NEIN") ..
+        " | Damage-Hook=" .. (damage_hook_available and "JA" or "NEIN") ..
+        " | Dateilog=" .. (WF_ENGINE_LOG_READY and "JA" or "NEIN")
+    )
+
     wf_emit("runtime_start", {
-        {"logger", "Wachterfeder EET Runtime Logger V5", "string"},
+        {"logger", "Wachterfeder EET Runtime Logger V6", "string"},
         {"console_source", WF_CONSOLE_SOURCE, "string"},
         {"log_ready", WF_ENGINE_LOG_READY, "boolean"},
         {"damage_hook", damage_hook_available, "boolean"},
@@ -251,5 +269,6 @@ end
 if type(EEex_GameState_AddInitializedListener) == "function" then
     EEex_GameState_AddInitializedListener(wf_install_observers)
 else
+    wf_diag("InitializedListener fehlt, Fallback wird verwendet")
     wf_install_observers()
 end
