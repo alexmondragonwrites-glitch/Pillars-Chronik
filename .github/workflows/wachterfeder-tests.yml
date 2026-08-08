@@ -29,6 +29,12 @@ jobs:
       - name: Compile Python sources
         run: python -m compileall tools/wachterfeder
 
+      - name: Test direct Windows launcher imports
+        shell: pwsh
+        run: |
+          Set-Location tools/wachterfeder
+          python -c "import unified_gui_runtime; print('direct launcher imports ok')"
+
       - name: Test save parser
         run: python -m unittest tools.wachterfeder.tests.test_wachterfeder -v
 
