@@ -20,6 +20,7 @@ except ModuleNotFoundError:  # direct execution from tools/wachterfeder
 
 JsonObject = dict[str, Any]
 LOGGER_MARKER = "WACHTERFEDER_EET_COMBAT_LOGGER_V1"
+LOGGER_CURRENT_MARKER = "WACHTERFEDER_EEEX_SAFE_LOGGING_V2"
 LOGGER_SCRIPT_NAME = "M_WFLOG.lua"
 TEMPLATE_RELATIVE = Path("tools/wachterfeder/eeex/M_WFLOG.lua.template")
 LOG_PREFIX = "WFLOG|"
@@ -29,6 +30,7 @@ LOG_PREFIX = "WFLOG|"
 class CombatLoggerStatus:
     eeex_available: bool
     installed: bool
+    up_to_date: bool
     script_path: Path
     log_path: Path
 
@@ -54,13 +56,17 @@ def logger_status(game_path: Path, *, root: Path | None = None, language: str = 
     assets = resolve_eet_game_assets(game_path, language)
     script = _script_path(assets.game_root)
     installed = False
+    up_to_date = False
     try:
-        installed = LOGGER_MARKER in script.read_text(encoding="utf-8")
+        content = script.read_text(encoding="utf-8", errors="replace")
+        installed = LOGGER_MARKER in content
+        up_to_date = installed and LOGGER_CURRENT_MARKER in content
     except OSError:
         pass
     return CombatLoggerStatus(
         eeex_available=_eeex_available(assets.game_root),
         installed=installed,
+        up_to_date=up_to_date,
         script_path=script,
         log_path=runtime_log_path(root),
     )
@@ -95,7 +101,12 @@ def install_logger(game_path: Path, *, root: Path | None = None, language: str =
     # Reinstalling is intentionally an in-place upgrade of Wächterfeder's own
     # script. This is how fixes to the Lua runtime logger reach an existing setup.
     script.write_text(_render_template(log_path, root=root), encoding="utf-8")
-    return logger_status(assets.game_root, root=root, language=language)
+    status = logger_status(assets.game_root, root=root, language=language)
+    if not status.up_to_date:
+        raise EetError(
+            "Der Combatlogger wurde geschrieben, aber die aktuelle Logger-Version konnte danach nicht bestätigt werden."
+        )
+    return status
 
 
 def uninstall_logger(game_path: Path, *, root: Path | None = None, language: str = "de_DE") -> CombatLoggerStatus:
@@ -233,7 +244,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
 
     print(f"EEex:   {'erkannt' if status.eeex_available else 'nicht erkannt'}")
-    print(f"Logger: {'installiert' if status.installed else 'nicht installiert'}")
+    if status.installed:
+        logger_text = "aktuell" if status.up_to_date else "veraltet"
+    else:
+        logger_text = "nicht installiert"
+    print(f"Logger: {logger_text}")
     print(f"Script: {status.script_path}")
     print(f"Log:    {status.log_path}")
     return 0
