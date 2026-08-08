@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Install and read the optional Wächterfeder EEex runtime logger.
+"""Install the optional Wächterfeder EEex save-telemetry observer.
 
-The logger installs one ``M_*.lua`` observer into the EET override folder.
-EEex/Beamdog writes the runtime stream through its own logging facility to a
-small local file in the game directory. Wächterfeder only reads that file and
-never mutates savegame state.
+V7 no longer relies on native UI diagnostics, CLUAConsole logging, or direct
+file I/O from Lua. The installed ``M_WFLOG.lua`` writes only namespaced WF_*
+integer GLOBAL values into the next save. The normal EET save parser reads
+those values afterwards. Legacy log-reader helpers remain for old snapshots.
 """
 from __future__ import annotations
 
@@ -21,9 +21,9 @@ except ModuleNotFoundError:  # direct execution from tools/wachterfeder
 
 JsonObject = dict[str, Any]
 LOGGER_MARKER = "WACHTERFEDER_EET_COMBAT_LOGGER_V1"
-LOGGER_CURRENT_MARKER = "WACHTERFEDER_EET_RUNTIME_LOGGER_V6"
+LOGGER_CURRENT_MARKER = "WACHTERFEDER_EET_SAVE_TELEMETRY_V7"
 LOGGER_SCRIPT_NAME = "M_WFLOG.lua"
-ENGINE_LOG_NAME = "Wachterfeder-runtime.log"
+ENGINE_LOG_NAME = "Wachterfeder-runtime.log"  # legacy V3-V6 file
 TEMPLATE_RELATIVE = Path("tools/wachterfeder/eeex/M_WFLOG.lua.template")
 LOG_PREFIX = "WFLOG|"
 
@@ -43,7 +43,7 @@ def repository_root() -> Path:
 
 
 def runtime_log_path(root: Path | None = None, *, game_root: Path | None = None) -> Path:
-    """Return the V3+ engine log path, or the legacy repo-local path."""
+    """Return the legacy runtime-log path kept for backward compatibility."""
     if game_root is not None:
         return game_root.expanduser().resolve() / ENGINE_LOG_NAME
     root = (root or repository_root()).expanduser().resolve()
@@ -59,6 +59,7 @@ def _eeex_available(game_root: Path) -> bool:
 
 
 def _runtime_has_heartbeat(log_path: Path) -> bool:
+    """Legacy V3-V6 heartbeat detector. V7 activity is proved by save globals."""
     try:
         if not log_path.is_file() or log_path.stat().st_size <= 0:
             return False
@@ -84,7 +85,9 @@ def logger_status(game_path: Path, *, root: Path | None = None, language: str = 
         eeex_available=_eeex_available(assets.game_root),
         installed=installed,
         up_to_date=up_to_date,
-        runtime_active=up_to_date and _runtime_has_heartbeat(log_path),
+        # V7 intentionally has no live file heartbeat. Activity is confirmed
+        # after saving, via WF_RUNTIME_VERSION / WF_RUNTIME_BOOT_SEQ.
+        runtime_active=False,
         script_path=script,
         log_path=log_path,
     )
@@ -92,6 +95,8 @@ def logger_status(game_path: Path, *, root: Path | None = None, language: str = 
 
 def _render_template(log_path: Path, *, root: Path) -> str:
     template = (root / TEMPLATE_RELATIVE).read_text(encoding="utf-8")
+    # Placeholder replacement is retained so old/custom templates remain
+    # installable, although the V7 template contains no log path.
     portable = log_path.resolve().as_posix()
     return template.replace("__WACHTERFEDER_LOG_PATH__", portable)
 
@@ -116,18 +121,18 @@ def install_logger(game_path: Path, *, root: Path | None = None, language: str =
     script.parent.mkdir(parents=True, exist_ok=True)
     script.write_text(_render_template(log_path, root=root), encoding="utf-8")
 
-    # Prepare a clean, Wächterfeder-owned engine log. V6 also shows temporary
-    # in-game diagnostics, so script execution and dialogue-hook activity can be
-    # verified even when the file logging channel itself is unavailable.
+    # Remove the obsolete Wächterfeder-owned V3-V6 log so the UI cannot mistake
+    # stale bytes for current V7 activity.
     try:
-        log_path.write_text("", encoding="utf-8")
-    except OSError as exc:
-        raise EetError(f"Runtime-Log konnte nicht vorbereitet werden: {exc}") from exc
+        if log_path.exists():
+            log_path.unlink()
+    except OSError:
+        pass
 
     status = logger_status(assets.game_root, root=root, language=language)
     if not status.up_to_date:
         raise EetError(
-            "Der Runtime-Logger wurde geschrieben, aber die aktuelle Logger-Version konnte danach nicht bestätigt werden."
+            "Die EEex-Save-Telemetrie wurde geschrieben, aber V7 konnte danach nicht bestätigt werden."
         )
     return status
 
@@ -173,7 +178,6 @@ def _decode_log_line(raw_line: bytes) -> str:
 
 
 def _json_payload_from_log_line(raw_line: bytes) -> tuple[str | None, bool]:
-    """Return a JSON payload and whether the line belongs to Wächterfeder."""
     text = _decode_log_line(raw_line).strip()
     if not text:
         return None, False
@@ -186,7 +190,6 @@ def _json_payload_from_log_line(raw_line: bytes) -> tuple[str | None, bool]:
 
 
 def _event_identity(item: JsonObject) -> tuple[Any, ...]:
-    """Stable identity used to collapse print + Infinity_Log duplicate emits."""
     schema = item.get("schema_version")
     seq = item.get("seq")
     event = item.get("event")
@@ -196,6 +199,7 @@ def _event_identity(item: JsonObject) -> tuple[Any, ...]:
 
 
 def read_new_events(log_path: Path, start_offset: int) -> tuple[list[JsonObject], JsonObject]:
+    """Read legacy V3-V6 runtime lines when an old log still exists."""
     try:
         size = log_path.stat().st_size
     except OSError:
@@ -256,7 +260,7 @@ def summarise_events(events: list[JsonObject]) -> JsonObject:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Wächterfeder EEex Runtime-Logger")
+    parser = argparse.ArgumentParser(description="Wächterfeder EEex Save-Telemetrie")
     sub = parser.add_subparsers(dest="command", required=True)
     for name in ("install", "status", "uninstall"):
         item = sub.add_parser(name)
@@ -278,18 +282,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         else:
             status = logger_status(game, root=root, language=args.language)
     except (OSError, EetError) as exc:
-        print(f"Wächterfeder Runtime-Logger: {exc}")
+        print(f"Wächterfeder EEex-Telemetrie: {exc}")
         return 2
 
-    print(f"EEex:   {'erkannt' if status.eeex_available else 'nicht erkannt'}")
+    print(f"EEex:      {'erkannt' if status.eeex_available else 'nicht erkannt'}")
     if status.installed:
-        logger_text = "aktuell" if status.up_to_date else "veraltet"
+        telemetry_text = "aktuell" if status.up_to_date else "veraltet"
     else:
-        logger_text = "nicht installiert"
-    print(f"Logger: {logger_text}")
-    print(f"Runtime: {'aktiv' if status.runtime_active else 'noch kein Heartbeat'}")
-    print(f"Script: {status.script_path}")
-    print(f"Log:    {status.log_path}")
+        telemetry_text = "nicht installiert"
+    print(f"Telemetrie: {telemetry_text}")
+    print("Aktivität: wird nach dem nächsten Speichern über WF_* GLOBALs geprüft")
+    print(f"Script:    {status.script_path}")
     return 0
 
 
