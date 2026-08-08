@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -13,7 +12,7 @@ from tools.wachterfeder.eet_combat_logger import (
     summarise_events,
     uninstall_logger,
 )
-from tools.wachterfeder.eet_session_runtime import _augment_delta
+from tools.wachterfeder.eet_session_runtime import _augment_combat
 
 
 class EetCombatLoggerTests(unittest.TestCase):
@@ -79,10 +78,10 @@ class EetCombatLoggerTests(unittest.TestCase):
                 "lethal_candidate": True,
             }
         ]
-        updated = _augment_delta(delta, events, initial_runtime_baseline=False)
-        self.assertTrue(updated["summary"]["has_changes"])
-        self.assertEqual(updated["summary"]["combat_damage_total"], 9)
-        self.assertEqual(updated["changes"]["combat_log"][0]["source"], "Kivan")
+        _augment_combat(delta, events, initial_runtime_baseline=False)
+        self.assertTrue(delta["summary"]["has_changes"])
+        self.assertEqual(delta["summary"]["combat_damage_total"], 9)
+        self.assertEqual(delta["changes"]["combat_log"][0]["source"], "Kivan")
 
 
 if __name__ == "__main__":
