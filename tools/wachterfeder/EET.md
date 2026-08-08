@@ -50,11 +50,7 @@ Gespeichert werden nur lokale Einstellungen unter `.wachterfeder/eet/config.json
 
 ## Session auswerten
 
-Über die gemeinsame Oberfläche genügt im EET-Tab der Knopf **„Baldur's Gate auswerten“**. Alternativ:
-
-```powershell
-python tools/wachterfeder/eet_session.py inspect --save "PFAD_ZUM_SAVE_SLOT"
-```
+Über die gemeinsame Oberfläche genügt im EET-Tab der Knopf **„Baldur's Gate auswerten“**.
 
 ## Ausgaben
 
@@ -70,68 +66,93 @@ Aktuell erfasst werden:
 
 - Kampagne, Kapitel, Gebiet, Gold und Ruf,
 - Party-Zusammensetzung,
-- XP, Level, maximale Trefferpunkte, Attribute, Klasse und Kit der Gruppenmitglieder aus eingebetteten CRE-Daten,
+- XP, Level, maximale und aktuelle Trefferpunkte, Attribute, Klasse und Kit der Gruppenmitglieder,
+- aktuelle HP-Änderungen zwischen zwei Saves separat unter `party_hit_points`,
 - GLOBAL-Variablen,
 - neue Journal-Einträge mit Text aus der lokalen `dialog.tlk`,
 - lokale Gebietsvariablen aus `BALDUR.SAV`,
 - persistente NPC-Gesprächszähler (`NumTimesTalkedTo`) aus gespeicherten ARE-Ressourcen,
+- gestiegene Gesprächszähler von aktuellen Party-CREs,
 - Änderungen all dieser Werte zwischen zwei Saves.
+
+## Dialogauflösung über die lokale modifizierte Installation
+
+Wächterfeder benutzt für einen neu erkannten NPC- oder Party-Dialog den **lokal installierten WeiDU-Decoder**. Das effektive `DLG` wird nur temporär dekompiliert und nicht ins Repository oder in ein dauerhaftes Rohdialog-Archiv geschrieben.
+
+Der Resolver kombiniert:
+
+- den gestiegenen `NumTimesTalkedTo`-Wert,
+- den tatsächlich verwendeten Dialog-ResRef,
+- veränderte `GLOBAL`-Variablen,
+- neue Journal-Einträge,
+- beobachtbare `SetGlobal`-/`IncrementGlobal`- und Journal-Aktionen der möglichen Dialogtransitionen.
+
+Die Ausgabe landet unter:
+
+```text
+changes.dialogue_resolution
+```
+
+mit den Sicherheitsstufen:
+
+- `high`: genau ein Pfad passt zu beobachtbarer Save-Evidenz; nur dann darf `confirmed_reply` gesetzt werden,
+- `medium`: ein Pfad ist plausibel, aber nicht eindeutig genug für eine bestätigte Spielerantwort,
+- `low`: Dialog wurde gefunden, die Save-Daten reichen aber nicht zur Pfadbestimmung.
+
+Damit wird eine konkrete Spielerantwort niemals allein aus dem Dialogbaum geraten.
 
 ## Optionaler EEex-Combat-Logger
 
-Wenn EEex im EET-Spielordner installiert ist, kann Wächterfeder zusätzlich einen kleinen Laufzeit-Logger installieren:
+Wenn EEex im EET-Spielordner installiert ist, kann Wächterfeder zusätzlich einen kleinen Laufzeit-Logger installieren. Das geht jetzt direkt im **EET-Tab der gemeinsamen Wächterfeder-Oberfläche**. Dort werden außerdem sichtbar angezeigt:
 
 ```text
-EET Combatlogger installieren.cmd
+EEex erkannt / nicht erkannt
+Wächterfeder-Logger installiert / nicht installiert
+Log vorhanden / noch kein Log
 ```
 
-Der Installer verwendet den lokal gespeicherten EET-Spielpfad und legt genau eine Modder-Lua-Datei an:
+Die Installation erfolgt nur nach einem ausdrücklichen Klick auf **„Combatlogger installieren“** und legt genau eine Modder-Lua-Datei an:
 
 ```text
 <BG2EE>\override\M_WFLOG.lua
 ```
 
-Das entspricht dem von EEex vorgesehenen `M_*.lua`-Mechanismus. Die Datei verändert keinen Quest- oder Savezustand. Sie hängt sich an die vorhandenen EEex-Damage-Hooks und schreibt nur lokale JSON-Zeilen nach:
+Alternativ bleibt der bisherige Helfer verfügbar:
+
+```text
+EET Combatlogger installieren.cmd
+```
+
+Das Laufzeitprotokoll bleibt lokal:
 
 ```text
 .wachterfeder/eet/runtime/combat.jsonl
 ```
 
-Version 1 erfasst:
-
-- tatsächlichen HP-Verlust nach einem EEex-Damage-Effekt,
-- Quelle und Ziel, soweit die Engine sie auflösen kann,
-- HP vor und nach dem Effekt,
-- einen `lethal_candidate`, wenn das Ziel nach dem Effekt bei 0 oder weniger HP steht.
-
-`lethal_candidate` ist bewusst noch kein separat bestätigter Tod. Treffer-/Fehlschlagwürfe, Heilung und eine sichere Todesbestätigung folgen als spätere Logger-Stufen.
-
-### Wichtig beim ersten Einsatz
-
-Nach der Logger-Installation einmal **vor der nächsten Spielsitzung** im EET-Tab `Baldur's Gate auswerten` drücken. Dadurch setzt Wächterfeder den Cursor für das Laufzeitlog. Erst danach werden neu angehängte Kampfereignisse als Session-Delta übernommen.
+Version 1 erfasst tatsächlichen HP-Verlust nach einem EEex-Damage-Effekt, Quelle und Ziel soweit auflösbar, HP vor/nach dem Effekt und `lethal_candidate` bei HP <= 0. `lethal_candidate` ist noch kein separat bestätigter Tod.
 
 EET weiterhin ausschließlich über `InfinityLoader.exe` starten.
 
-Die neue Delta-Ausgabe ergänzt unter `summary` unter anderem:
+Die Delta-Ausgabe ergänzt unter anderem:
 
 ```text
-combat_events
-combat_damage_events
-combat_damage_total
-combat_lethal_candidates
-combat_logger_errors
+summary.party_hit_point_changes
+summary.party_conversations
+summary.dialogue_events_considered
+summary.dialogue_high_confidence
+summary.dialogue_medium_confidence
+summary.combat_events
 ```
 
 und unter `changes`:
 
 ```text
+party_hit_points
+party_conversations
+dialogue_resolution
 combat_log
 ```
 
-Damit bleiben die Rohdaten lokal und nur die neuen Kampfereignisse einer Session landen in `eet.delta.json`.
-
 ## Aussagekraft
 
-Ein gestiegener NPC-Gesprächszähler belegt, dass seit dem vorherigen Save erneut mit diesem persistenten Actor gesprochen wurde. Zusammen mit neuen GLOBAL-/Gebietsvariablen und Journal-Einträgen lässt sich dadurch ein großer Teil einer Session eingrenzen.
-
-Die exakt gewählte Spielerantwort wird noch nicht automatisch behauptet. Dafür folgt ein separater DLG-/WeiDU-Resolver, der nur eindeutige Pfade als bestätigt markieren soll.
+Ein gestiegener Gesprächszähler belegt eine neue Interaktion, aber nicht für sich allein die exakte Spielerantwort. Erst eine eindeutige Kombination aus Dialogstruktur und beobachtbaren Save-Änderungen darf eine Antwort als bestätigt markieren. Wo diese Evidenz fehlt, bleibt Wächterfeder ausdrücklich bei einer niedrigeren Sicherheit.
