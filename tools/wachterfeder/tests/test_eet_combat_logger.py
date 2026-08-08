@@ -58,7 +58,7 @@ class EetCombatLoggerTests(unittest.TestCase):
             self.assertNotIn("__WACHTERFEDER_LOG_PATH__", script_text)
 
             status.log_path.write_text(
-                LOG_PREFIX + '{"schema_version":5,"event":"runtime_start","seq":1}\n',
+                LOG_PREFIX + '{"schema_version":6,"event":"runtime_start","seq":1}\n',
                 encoding="utf-8",
             )
             heartbeat_status = logger_status(game, root=root)
@@ -89,10 +89,10 @@ class EetCombatLoggerTests(unittest.TestCase):
             log.write_text("old engine output\n", encoding="utf-8")
             offset = log.stat().st_size
             with log.open("a", encoding="utf-8") as handle:
-                handle.write('Some engine prefix ' + LOG_PREFIX + '{"schema_version":5,"event":"runtime_start","seq":1}\n')
+                handle.write('Some engine prefix ' + LOG_PREFIX + '{"schema_version":6,"event":"runtime_start","seq":1}\n')
                 handle.write('ordinary unrelated engine line\n')
-                handle.write(LOG_PREFIX + '{"schema_version":5,"event":"damage","seq":2,"damage":5,"lethal_candidate":true}\n')
-                handle.write(LOG_PREFIX + '{"schema_version":5,"event":"dialogue_choice","seq":3,"arg1":"2"}\n')
+                handle.write(LOG_PREFIX + '{"schema_version":6,"event":"damage","seq":2,"damage":5,"lethal_candidate":true}\n')
+                handle.write(LOG_PREFIX + '{"schema_version":6,"event":"dialogue_choice","seq":3,"arg1":"2"}\n')
 
             events, metadata = read_new_events(log, offset)
             self.assertEqual(len(events), 3)
@@ -106,7 +106,7 @@ class EetCombatLoggerTests(unittest.TestCase):
     def test_reader_deduplicates_print_and_infinity_log_echoes(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             log = Path(temporary) / ENGINE_LOG_NAME
-            line = LOG_PREFIX + '{"schema_version":5,"event":"runtime_start","seq":1}\n'
+            line = LOG_PREFIX + '{"schema_version":6,"event":"runtime_start","seq":1}\n'
             log.write_text(line + line, encoding="utf-8")
             events, metadata = read_new_events(log, 0)
             self.assertEqual(len(events), 1)
@@ -122,7 +122,7 @@ class EetCombatLoggerTests(unittest.TestCase):
             self.assertEqual(events[0]["damage"], 3)
             self.assertEqual(metadata["malformed_lines"], 0)
 
-    def test_real_template_constructs_private_clua_console_and_observes_dialogue(self) -> None:
+    def test_real_template_has_visible_diagnostics_and_observes_dialogue(self) -> None:
         template = Path(__file__).resolve().parents[1] / "eeex" / "M_WFLOG.lua.template"
         text = template.read_text(encoding="utf-8")
         self.assertIn(LOGGER_CURRENT_MARKER, text)
@@ -132,8 +132,10 @@ class EetCombatLoggerTests(unittest.TestCase):
         self.assertIn('wf_try_prepare_console(console, "constructed_CLUAConsole")', text)
         self.assertIn("console:LogSet(WF_LOG_PATH)", text)
         self.assertIn("console:LogMessages()", text)
-        self.assertIn("print(payload)", text)
-        self.assertIn("Infinity_Log", text)
+        self.assertIn("Infinity_DisplayString", text)
+        self.assertIn('wf_diag("Lua-Datei geladen")', text)
+        self.assertIn("Dialogwahl erkannt | arg1=", text)
+        self.assertIn("EEex initialisiert | Dialog-Hook=", text)
         self.assertIn("Infinity_SelectDialogueOption", text)
         self.assertIn('wf_emit("dialogue_choice"', text)
         self.assertIn('wf_emit("runtime_start"', text)
@@ -145,7 +147,7 @@ class EetCombatLoggerTests(unittest.TestCase):
     def test_runtime_augmentation_splits_combat_and_dialogue_events(self) -> None:
         delta = {"summary": {"has_changes": False}, "changes": {}, "notes": []}
         events = [
-            {"event": "runtime_start", "logger": "V5", "console_source": "constructed_CLUAConsole"},
+            {"event": "runtime_start", "logger": "V6", "console_source": "constructed_CLUAConsole"},
             {
                 "event": "damage",
                 "source": "Kivan",
