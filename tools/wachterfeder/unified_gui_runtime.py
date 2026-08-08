@@ -42,7 +42,12 @@ class UnifiedWachterfederApp(gui_module.UnifiedWachterfederApp):
         ttk.Label(combat_box, textvariable=self.eet_logger_status_var, justify="left").pack(anchor="w")
         controls = ttk.Frame(combat_box)
         controls.pack(fill="x", pady=(7, 0))
-        ttk.Button(controls, text="Combatlogger installieren", command=self._install_eet_logger).pack(side="left")
+        self.eet_logger_install_button = ttk.Button(
+            controls,
+            text="Combatlogger installieren",
+            command=self._install_eet_logger,
+        )
+        self.eet_logger_install_button.pack(side="left")
         ttk.Button(controls, text="Status prüfen", command=self._refresh_eet_logger_status).pack(side="left", padx=(8, 0))
         ttk.Button(controls, text="Logger entfernen", command=self._uninstall_eet_logger).pack(side="left", padx=(8, 0))
 
@@ -54,6 +59,8 @@ class UnifiedWachterfederApp(gui_module.UnifiedWachterfederApp):
         game = self.eet_game_var.get().strip()
         if not game:
             self.eet_logger_status_var.set("EEex-Logger: erst EET/BG2EE-Spielordner auswählen.")
+            if hasattr(self, "eet_logger_install_button"):
+                self.eet_logger_install_button.configure(text="Combatlogger installieren")
             return
         try:
             status = logger_status(Path(game), root=self.root_path, language="de_DE")
@@ -61,10 +68,21 @@ class UnifiedWachterfederApp(gui_module.UnifiedWachterfederApp):
             self.eet_logger_status_var.set(f"EEex-Logger: {exc}")
             return
         log_state = "Log vorhanden" if status.log_path.is_file() else "noch kein Log"
+        if status.installed and status.up_to_date:
+            logger_state = "aktuell"
+            button_text = "Combatlogger neu installieren"
+        elif status.installed:
+            logger_state = "VERALTET · Aktualisierung erforderlich"
+            button_text = "Combatlogger aktualisieren"
+        else:
+            logger_state = "nicht installiert"
+            button_text = "Combatlogger installieren"
         self.eet_logger_status_var.set(
             f"EEex: {'erkannt' if status.eeex_available else 'nicht erkannt'} · "
-            f"Wächterfeder-Logger: {'installiert' if status.installed else 'nicht installiert'} · {log_state}"
+            f"Wächterfeder-Logger: {logger_state} · {log_state}"
         )
+        if hasattr(self, "eet_logger_install_button"):
+            self.eet_logger_install_button.configure(text=button_text)
 
     def _install_eet_logger(self) -> None:
         game = self.eet_game_var.get().strip()
@@ -79,8 +97,8 @@ class UnifiedWachterfederApp(gui_module.UnifiedWachterfederApp):
             return
         self._refresh_eet_logger_status()
         messagebox.showinfo(
-            "Combatlogger installiert",
-            f"Wächterfeder hat nur sein eigenes EEex-Script installiert:\n{status.script_path}\n\n"
+            "Combatlogger aktualisiert",
+            f"Aktuelle Wächterfeder-Logger-Version bestätigt:\n{status.script_path}\n\n"
             "EET weiterhin über InfinityLoader.exe starten.",
         )
 
