@@ -5,6 +5,7 @@ on:
     branches: [main, agent/wachterfeder-mvp]
     paths:
       - "Wachterfeder starten.bat"
+      - "EET Combatlogger installieren.cmd"
       - "tools/wachterfeder/**"
       - ".github/workflows/wachterfeder-tests.yml"
       - ".gitignore"
@@ -68,3 +69,6 @@ jobs:
 
       - name: Test EET real-session delta
         run: python -m unittest tools.wachterfeder.tests.test_eet_session -v
+
+      - name: Test EET EEex combat logger
+        run: python -m unittest tools.wachterfeder.tests.test_eet_combat_logger -v
