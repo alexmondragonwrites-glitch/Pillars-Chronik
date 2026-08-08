@@ -1,0 +1,125 @@
+-- WACHTERFEDER_EET_COMBAT_LOGGER_V1
+-- Generated into the local EET override folder by Wächterfeder.
+-- Read-only towards game state: this script only appends JSON lines to LOG_PATH.
+
+local WF_LOG_PATH = [[__WACHTERFEDER_LOG_PATH__]]
+local WF_SEQ = 0
+local WF_START_HP = {}
+
+local function wf_escape(value)
+    local text = tostring(value or "")
+    text = string.gsub(text, "\\", "\\\\")
+    text = string.gsub(text, '"', '\\"')
+    text = string.gsub(text, "\r", "\\r")
+    text = string.gsub(text, "\n", "\\n")
+    return text
+end
+
+local function wf_number(value, fallback)
+    local number = tonumber(value)
+    if number == nil then return fallback or -1 end
+    return number
+end
+
+local function wf_sprite_name(sprite)
+    if sprite == nil then return "" end
+    local ok, value = pcall(function() return sprite:getName() end)
+    if ok and value ~= nil and tostring(value) ~= "" then
+        return tostring(value)
+    end
+    return ""
+end
+
+local function wf_sprite_id(sprite)
+    if sprite == nil then return -1 end
+    local ok, value = pcall(function() return sprite.m_id end)
+    if ok then return wf_number(value, -1) end
+    return -1
+end
+
+local function wf_hp(sprite)
+    if sprite == nil then return nil end
+    local ok, value = pcall(function() return sprite.m_baseStats.m_hitPoints end)
+    if ok then return tonumber(value) end
+    return nil
+end
+
+local function wf_append(line)
+    local file = io.open(WF_LOG_PATH, "a")
+    if file == nil then return end
+    file:write(line)
+    file:write("\n")
+    file:flush()
+    file:close()
+end
+
+local function wf_emit(kind, fields)
+    WF_SEQ = WF_SEQ + 1
+    local parts = {
+        '{"schema_version":1',
+        ',"event":"' .. wf_escape(kind) .. '"',
+        ',"seq":' .. tostring(WF_SEQ)
+    }
+    for _, field in ipairs(fields or {}) do
+        local key = field[1]
+        local value = field[2]
+        local value_type = field[3]
+        if value_type == "number" then
+            table.insert(parts, ',"' .. wf_escape(key) .. '":' .. tostring(wf_number(value, -1)))
+        elseif value_type == "boolean" then
+            table.insert(parts, ',"' .. wf_escape(key) .. '":' .. (value and "true" or "false"))
+        else
+            table.insert(parts, ',"' .. wf_escape(key) .. '":"' .. wf_escape(value) .. '"')
+        end
+    end
+    table.insert(parts, "}")
+    wf_append(table.concat(parts))
+end
+
+local WF_ORIGINAL_DAMAGE_START = EEex_Sprite_Hook_OnDamageEffectStartingCalculations
+local WF_ORIGINAL_DAMAGE_DONE = EEex_Sprite_Hook_OnDamageEffectDone
+
+if type(WF_ORIGINAL_DAMAGE_START) == "function" and type(WF_ORIGINAL_DAMAGE_DONE) == "function" then
+
+    function EEex_Sprite_Hook_OnDamageEffectStartingCalculations(effect, sourceSprite, targetSprite)
+        local target_id = wf_sprite_id(targetSprite)
+        local hp = wf_hp(targetSprite)
+        if target_id ~= -1 and hp ~= nil then
+            WF_START_HP[target_id] = hp
+        end
+        return WF_ORIGINAL_DAMAGE_START(effect, sourceSprite, targetSprite)
+    end
+
+    function EEex_Sprite_Hook_OnDamageEffectDone(effect, sourceSprite, targetSprite)
+        local result = WF_ORIGINAL_DAMAGE_DONE(effect, sourceSprite, targetSprite)
+        local target_id = wf_sprite_id(targetSprite)
+        local before = WF_START_HP[target_id]
+        local after = wf_hp(targetSprite)
+        WF_START_HP[target_id] = nil
+
+        if before ~= nil and after ~= nil then
+            local damage = before - after
+            if damage > 0 then
+                wf_emit("damage", {
+                    {"source", wf_sprite_name(sourceSprite), "string"},
+                    {"source_id", wf_sprite_id(sourceSprite), "number"},
+                    {"target", wf_sprite_name(targetSprite), "string"},
+                    {"target_id", target_id, "number"},
+                    {"damage", damage, "number"},
+                    {"hp_before", before, "number"},
+                    {"hp_after", after, "number"},
+                    {"lethal_candidate", after <= 0, "boolean"}
+                })
+            end
+        end
+        return result
+    end
+
+    wf_emit("logger_start", {
+        {"hook", "EEex_Sprite_Hook_OnDamageEffectDone", "string"}
+    })
+else
+    wf_emit("logger_error", {
+        {"reason", "damage_hooks_unavailable", "string"}
+    })
+end
