@@ -54,12 +54,13 @@ def _read_cursor(root: Path) -> tuple[bool, int]:
         return True, 0
 
 
-def _store_cursor(root: Path, metadata: JsonObject) -> None:
+def _store_cursor(root: Path, metadata: JsonObject, *, log_path: Path) -> None:
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "cursor": int(metadata.get("cursor", 0) or 0),
         "size": int(metadata.get("size", 0) or 0),
         "modified_ns": metadata.get("modified_ns"),
+        "log_name": log_path.name,
     }
     _write_json(_cursor_path(root), payload)
 
@@ -150,27 +151,41 @@ def _augment_party_runtime(delta: JsonObject, previous: Mapping[str, Any] | None
         summary["has_changes"] = True
 
 
-def _augment_combat(delta: JsonObject, events: list[JsonObject], *, initial_runtime_baseline: bool) -> None:
+def _augment_runtime(delta: JsonObject, events: list[JsonObject], *, initial_runtime_baseline: bool) -> None:
     summary = delta.setdefault("summary", {})
     changes = delta.setdefault("changes", {})
     notes = delta.setdefault("notes", [])
-    combat = summarise_events(events)
+    runtime = summarise_events(events)
 
-    summary["combat_events"] = combat["events"]
-    summary["combat_damage_events"] = combat["damage_events"]
-    summary["combat_damage_total"] = combat["damage_total"]
-    summary["combat_lethal_candidates"] = combat["lethal_candidates"]
-    summary["combat_logger_errors"] = combat["logger_errors"]
-    if events:
+    damage_events = [item for item in events if item.get("event") == "damage"]
+    dialogue_choices = [item for item in events if item.get("event") == "dialogue_choice"]
+    diagnostic_events = [item for item in events if item.get("event") in {"runtime_start", "logger_error"}]
+
+    summary["runtime_events"] = runtime["events"]
+    summary["runtime_starts"] = runtime["runtime_starts"]
+    summary["live_dialogue_choices"] = runtime["dialogue_choices"]
+    summary["combat_events"] = runtime["damage_events"]
+    summary["combat_damage_events"] = runtime["damage_events"]
+    summary["combat_damage_total"] = runtime["damage_total"]
+    summary["combat_lethal_candidates"] = runtime["lethal_candidates"]
+    summary["combat_logger_errors"] = runtime["logger_errors"]
+
+    changes["runtime_log"] = events
+    changes["combat_log"] = damage_events
+    changes["live_dialogue_choices"] = dialogue_choices
+    changes["runtime_diagnostics"] = diagnostic_events
+
+    # Heartbeats alone are diagnostics, not story/gameplay changes.
+    if damage_events or dialogue_choices:
         summary["has_changes"] = True
-    changes["combat_log"] = events
 
     if initial_runtime_baseline:
         notes.append(
-            "Combat-Logger: erste Laufzeit-Basis erstellt; vorhandene ältere Logzeilen wurden nicht als neue Session-Ereignisse übernommen."
+            "Runtime-Logger: erste Laufzeit-Basis erstellt; vorhandene ältere Logzeilen wurden nicht als neue Session-Ereignisse übernommen."
         )
     notes.append(
-        "Combat-Logger v1 erfasst tatsächlichen HP-Verlust aus EEex-Damage-Effekten. lethal_candidate bedeutet HP <= 0 nach diesem Effekt und ist noch kein separat bestätigter Tod."
+        "Runtime-Logger V3 beobachtet EEex-Damage-Effekte und tatsächliche Aufrufe von Infinity_SelectDialogueOption. "
+        "Dialogargumente werden zunächst roh protokolliert und erst nach bestätigter Zuordnung als konkrete Antwort interpretiert."
     )
 
 
@@ -223,7 +238,14 @@ def analyse_session(
     delta = _read_json(result.delta_path)
     _augment_party_runtime(delta, previous_snapshot or None, current_snapshot)
 
-    log_path = runtime_log_path(root)
+    status = None
+    if resolved_game is not None:
+        try:
+            status = logger_status(resolved_game, root=root, language=language)
+        except (OSError, EetError):
+            status = None
+
+    log_path = status.log_path if status is not None else runtime_log_path(root)
     had_cursor, start_offset = _read_cursor(root)
     if had_cursor:
         events, metadata = read_new_events(log_path, start_offset)
@@ -231,22 +253,22 @@ def analyse_session(
         events = []
         metadata = log_metadata(log_path)
         metadata["malformed_lines"] = 0
-    _augment_combat(delta, events, initial_runtime_baseline=not had_cursor)
+    _augment_runtime(delta, events, initial_runtime_baseline=not had_cursor)
 
-    status = None
     if resolved_game is not None:
-        try:
-            status = logger_status(resolved_game, root=root, language=language)
-        except (OSError, EetError):
-            status = None
         _augment_dialogues(delta, game_path=resolved_game, language=language)
 
     current_snapshot["runtime_combat"] = {
-        "schema_version": 2,
+        "schema_version": 3,
         "eeex_available": bool(status and status.eeex_available),
         "logger_installed": bool(status and status.installed),
-        "enabled": bool(status and status.installed),
+        "logger_up_to_date": bool(status and status.up_to_date),
+        "runtime_active": bool(status and status.runtime_active),
+        # Backward-compatible alias. In V3 enabled means installed+current;
+        # runtime_active is the stronger proof that a heartbeat was observed.
+        "enabled": bool(status and status.up_to_date),
         "log_exists": bool(metadata.get("exists")),
+        "log_name": log_path.name,
         "cursor": int(metadata.get("cursor", 0) or 0),
         "size": int(metadata.get("size", 0) or 0),
         "malformed_lines_since_previous": int(metadata.get("malformed_lines", 0) or 0),
@@ -254,5 +276,5 @@ def analyse_session(
     _write_json(result.snapshot_path, current_snapshot)
     _write_json(result.delta_path, delta)
     _write_json(result.history_delta_path, delta)
-    _store_cursor(root, metadata)
+    _store_cursor(root, metadata, log_path=log_path)
     return result
