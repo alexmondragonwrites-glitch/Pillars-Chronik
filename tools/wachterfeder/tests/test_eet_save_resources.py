@@ -46,10 +46,12 @@ def make_cre(name_ref: int = 42, death: str = "TESTNPC", dialog: str = "TESTDLG"
 
 
 def make_area() -> bytes:
-    area = bytearray(0x800)
+    # Keep actor table, embedded CRE and variable table physically separate.
+    area = bytearray(0x1000)
     area[:8] = b"AREAV1.0"
     actor_offset = 0x100
-    variable_offset = 0x500
+    cre_offset = 0x300
+    variable_offset = 0x700
     struct.pack_into("<I", area, 0x54, actor_offset)
     struct.pack_into("<H", area, 0x58, 1)
     struct.pack_into("<I", area, 0x88, variable_offset)
@@ -58,7 +60,6 @@ def make_area() -> bytes:
     _put_text(area, actor_offset, 32, "testnpc")
     struct.pack_into("<I", area, actor_offset + 0x44, 3)
     cre = make_cre()
-    cre_offset = 0x180
     struct.pack_into("<I", area, actor_offset + 0x88, cre_offset)
     struct.pack_into("<I", area, actor_offset + 0x8C, len(cre))
     area[cre_offset : cre_offset + len(cre)] = cre
