@@ -2,13 +2,15 @@
 -- WACHTERFEDER_EEEX_SAFE_LOGGING_V2
 -- WACHTERFEDER_EET_RUNTIME_LOGGER_V3
 -- WACHTERFEDER_EET_RUNTIME_LOGGER_V4
+-- WACHTERFEDER_EET_RUNTIME_LOGGER_V5
 -- Generated into the local EET override folder by Wächterfeder.
 -- Read-only towards game state: this script observes EEex/engine events and
 -- emits prefixed lines through the engine-supported logging channel.
 --
--- V4 deliberately waits for EEex_GameState_AddInitializedListener() before it
--- registers observers or writes a heartbeat. This avoids touching CLUA/engine
--- facilities while the Lua environment is still being assembled.
+-- V5 does not assume that the global CLUA console object `C` exists. In a
+-- normal game without Debug Mode it may be absent. Beamdog/EEex exposes the
+-- CLUAConsole class itself, so Wächterfeder constructs a private console
+-- instance when necessary and uses that only for LogSet()/LogMessages().
 
 local WF_LOG_PATH = [[__WACHTERFEDER_LOG_PATH__]]
 local WF_PREFIX = "WFLOG|"
@@ -16,6 +18,9 @@ local WF_SEQ = 0
 local WF_START_HP = {}
 local WF_ENGINE_LOG_READY = false
 local WF_OBSERVERS_INSTALLED = false
+local WF_CONSOLE = nil
+local WF_CONSOLE_SOURCE = "none"
+local WF_LOG_FAILURE_SHOWN = false
 
 local function wf_escape(value)
     local text = tostring(value or "")
@@ -63,40 +68,76 @@ local function wf_safe_call(func_name, fallback)
     return fallback
 end
 
+local function wf_try_prepare_console(console, source)
+    if console == nil then return false end
+    local ok = pcall(function()
+        console:LogSet(WF_LOG_PATH)
+        console:LogMessages()
+    end)
+    if ok then
+        WF_CONSOLE = console
+        WF_CONSOLE_SOURCE = source
+        WF_ENGINE_LOG_READY = true
+        return true
+    end
+    return false
+end
+
 local function wf_prepare_engine_log()
     if WF_ENGINE_LOG_READY then return true end
-    local ok = pcall(function()
-        if C == nil then error("CLUAConsole unavailable") end
-        C:LogSet(WF_LOG_PATH)
-        C:LogMessages()
-    end)
-    WF_ENGINE_LOG_READY = ok
-    return ok
+
+    -- Debug Mode creates the traditional global `C`. Use it when available.
+    if C ~= nil and wf_try_prepare_console(C, "global_C") then
+        return true
+    end
+
+    -- In normal play `C` can be nil. CLUAConsole:new() is the documented
+    -- constructor and lets the logger work without changing Baldur.lua or
+    -- enabling cheats/debug mode.
+    if CLUAConsole ~= nil then
+        local ok, console = pcall(function() return CLUAConsole:new() end)
+        if ok and console ~= nil and wf_try_prepare_console(console, "constructed_CLUAConsole") then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function wf_show_log_failure_once()
+    if WF_LOG_FAILURE_SHOWN then return end
+    WF_LOG_FAILURE_SHOWN = true
+    if type(Infinity_DisplayString) == "function" then
+        pcall(function()
+            Infinity_DisplayString("[Wächterfeder] Runtime-Log konnte nicht geöffnet werden.")
+        end)
+    end
 end
 
 local function wf_append(line)
-    if not wf_prepare_engine_log() then return false end
     local payload = WF_PREFIX .. line
+    local prepared = wf_prepare_engine_log()
     local wrote = false
 
-    -- C:LogMessages() + C:LogSet() control the engine/console logging stream.
-    -- Lua print is the least-assumptive producer for that stream.
+    -- Emit to both known Lua/engine logging entry points. Even if LogSet()
+    -- could not be prepared, these calls are harmless and useful for diagnosis.
     local print_ok = pcall(function() print(payload) end)
     wrote = wrote or print_ok
-
-    -- Some EE builds expose Infinity_Log as an additional logging entry point.
-    -- Emit there as well; the Python reader de-duplicates identical seq values.
     if type(Infinity_Log) == "function" then
         local infinity_ok = pcall(function() Infinity_Log(payload) end)
         wrote = wrote or infinity_ok
     end
-    return wrote
+
+    if not prepared then
+        wf_show_log_failure_once()
+    end
+    return prepared and wrote
 end
 
 local function wf_emit(kind, fields)
     WF_SEQ = WF_SEQ + 1
     local parts = {
-        '{"schema_version":4',
+        '{"schema_version":5',
         ',"event":"' .. wf_escape(kind) .. '"',
         ',"seq":' .. tostring(WF_SEQ)
     }
@@ -119,6 +160,9 @@ end
 local function wf_install_observers()
     if WF_OBSERVERS_INSTALLED then return end
     WF_OBSERVERS_INSTALLED = true
+
+    -- Prepare logging first so runtime_start can prove the full channel.
+    wf_prepare_engine_log()
 
     -- ---------------------------------------------------------------------
     -- Dialogue observation
@@ -194,10 +238,10 @@ local function wf_install_observers()
         })
     end
 
-    -- Only emit the heartbeat after the engine is initialized and observers
-    -- have actually been inspected / registered.
     wf_emit("runtime_start", {
-        {"logger", "Wachterfeder EET Runtime Logger V4", "string"},
+        {"logger", "Wachterfeder EET Runtime Logger V5", "string"},
+        {"console_source", WF_CONSOLE_SOURCE, "string"},
+        {"log_ready", WF_ENGINE_LOG_READY, "boolean"},
         {"damage_hook", damage_hook_available, "boolean"},
         {"dialogue_hook", dialogue_hook_available, "boolean"},
         {"screen", wf_safe_call("Infinity_GetCurrentScreenName", ""), "string"}
@@ -207,7 +251,5 @@ end
 if type(EEex_GameState_AddInitializedListener) == "function" then
     EEex_GameState_AddInitializedListener(wf_install_observers)
 else
-    -- Compatibility fallback. Current EEex provides the initialized listener,
-    -- but an older build should still fail softly rather than blocking startup.
     wf_install_observers()
 end
