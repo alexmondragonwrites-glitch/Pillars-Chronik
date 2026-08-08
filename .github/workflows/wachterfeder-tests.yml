@@ -65,3 +65,6 @@ jobs:
 
       - name: Test EET SAV and embedded CRE resources
         run: python -m unittest tools.wachterfeder.tests.test_eet_save_resources -v
+
+      - name: Test EET real-session delta
+        run: python -m unittest tools.wachterfeder.tests.test_eet_session -v
