@@ -21,7 +21,7 @@ except ModuleNotFoundError:  # direct execution from tools/wachterfeder
 
 JsonObject = dict[str, Any]
 LOGGER_MARKER = "WACHTERFEDER_EET_COMBAT_LOGGER_V1"
-LOGGER_CURRENT_MARKER = "WACHTERFEDER_EET_RUNTIME_LOGGER_V5"
+LOGGER_CURRENT_MARKER = "WACHTERFEDER_EET_RUNTIME_LOGGER_V6"
 LOGGER_SCRIPT_NAME = "M_WFLOG.lua"
 ENGINE_LOG_NAME = "Wachterfeder-runtime.log"
 TEMPLATE_RELATIVE = Path("tools/wachterfeder/eeex/M_WFLOG.lua.template")
@@ -92,9 +92,6 @@ def logger_status(game_path: Path, *, root: Path | None = None, language: str = 
 
 def _render_template(log_path: Path, *, root: Path) -> str:
     template = (root / TEMPLATE_RELATIVE).read_text(encoding="utf-8")
-    # Lua long strings accept forward slashes on Windows and avoid escaping
-    # backslashes. V4+ uses an absolute path so the engine logger does not
-    # depend on the process working directory chosen by InfinityLoader/Baldur.
     portable = log_path.resolve().as_posix()
     return template.replace("__WACHTERFEDER_LOG_PATH__", portable)
 
@@ -119,9 +116,9 @@ def install_logger(game_path: Path, *, root: Path | None = None, language: str =
     script.parent.mkdir(parents=True, exist_ok=True)
     script.write_text(_render_template(log_path, root=root), encoding="utf-8")
 
-    # Prepare a clean, Wächterfeder-owned engine log. V5 writes runtime_start
-    # after EEex initializes and can construct its own CLUAConsole instance if
-    # the normal global C object is absent because Debug Mode is disabled.
+    # Prepare a clean, Wächterfeder-owned engine log. V6 also shows temporary
+    # in-game diagnostics, so script execution and dialogue-hook activity can be
+    # verified even when the file logging channel itself is unavailable.
     try:
         log_path.write_text("", encoding="utf-8")
     except OSError as exc:
