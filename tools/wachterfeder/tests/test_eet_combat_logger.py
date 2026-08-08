@@ -5,9 +5,11 @@ import unittest
 from pathlib import Path
 
 from tools.wachterfeder.eet_combat_logger import (
+    LOGGER_CURRENT_MARKER,
     LOGGER_MARKER,
     LOG_PREFIX,
     install_logger,
+    logger_status,
     read_new_events,
     runtime_log_path,
     summarise_events,
@@ -30,7 +32,7 @@ class EetCombatLoggerTests(unittest.TestCase):
         template = root / "tools" / "wachterfeder" / "eeex" / "M_WFLOG.lua.template"
         template.parent.mkdir(parents=True)
         template.write_text(
-            f"-- {LOGGER_MARKER}\nlocal LOG = [[__WACHTERFEDER_LOG_PATH__]]\n",
+            f"-- {LOGGER_MARKER}\n-- {LOGGER_CURRENT_MARKER}\nlocal LOG = [[__WACHTERFEDER_LOG_PATH__]]\n",
             encoding="utf-8",
         )
 
@@ -42,14 +44,28 @@ class EetCombatLoggerTests(unittest.TestCase):
 
             status = install_logger(game, root=root)
             self.assertTrue(status.installed)
+            self.assertTrue(status.up_to_date)
             self.assertTrue(status.eeex_available)
             self.assertTrue(status.script_path.is_file())
             self.assertIn(LOGGER_MARKER, status.script_path.read_text(encoding="utf-8"))
+            self.assertIn(LOGGER_CURRENT_MARKER, status.script_path.read_text(encoding="utf-8"))
             self.assertIn(runtime_log_path(root).as_posix(), status.script_path.read_text(encoding="utf-8"))
 
             status = uninstall_logger(game, root=root)
             self.assertFalse(status.installed)
+            self.assertFalse(status.up_to_date)
             self.assertFalse((game / "override" / "M_WFLOG.lua").exists())
+
+    def test_status_marks_legacy_logger_as_outdated(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            game = self._make_game(root)
+            script = game / "override" / "M_WFLOG.lua"
+            script.parent.mkdir(parents=True)
+            script.write_text(f"-- {LOGGER_MARKER}\nlocal file = io.open('x', 'a')\n", encoding="utf-8")
+            status = logger_status(game, root=root)
+            self.assertTrue(status.installed)
+            self.assertFalse(status.up_to_date)
 
     def test_reader_accepts_prefixed_clua_lines_and_ignores_engine_noise(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -81,6 +97,7 @@ class EetCombatLoggerTests(unittest.TestCase):
     def test_real_template_does_not_assume_lua_io_exists(self) -> None:
         template = Path(__file__).resolve().parents[1] / "eeex" / "M_WFLOG.lua.template"
         text = template.read_text(encoding="utf-8")
+        self.assertIn(LOGGER_CURRENT_MARKER, text)
         self.assertIn('type(io) == "table"', text)
         self.assertIn("C:LogSet(WF_LOG_PATH)", text)
         self.assertIn("C:LogMessages()", text)
