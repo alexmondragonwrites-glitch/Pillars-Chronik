@@ -6,19 +6,22 @@
 -- WACHTERFEDER_EET_RUNTIME_LOGGER_V6
 -- WACHTERFEDER_EET_SAVE_TELEMETRY_V7
 -- WACHTERFEDER_EET_SAVE_TELEMETRY_V7_1
+-- WACHTERFEDER_EET_SAVE_TELEMETRY_V7_2
 -- Generated into the local EET override folder by Wächterfeder.
 --
--- V7.1 intentionally abandons native UI diagnostics and CLUA/file logging.
--- Both were too fragile across EEex / EET configurations, and the V6 startup
--- diagnostic could crash during early engine initialization.
+-- V7.2 keeps the safe save-global transport from V7, but changes the hook
+-- timing. M_*.lua files are executed by the game's includes.lua; therefore the
+-- dialogue wrapper is installed through EEex_GameState_AddAfterIncludesListener
+-- so later include/UI initialization cannot replace it again.
 --
--- Instead V7.1 stores a very small namespaced integer telemetry record in GLOBAL
--- save variables through EEex_GameState_SetGlobalInt(). Existing game variables
--- are never overwritten. Integer globals are deliberately used because the
--- normal GAME V2.0 save parser can read them without any EEex runtime support.
+-- Runtime globals are deliberately written only when a real dialogue choice is
+-- observed. Startup globals can be replaced when the player subsequently loads
+-- a save. Writing at dialogue time guarantees that the active game session owns
+-- the WF_* values that will be persisted by the next save.
 
 local WF_OBSERVERS_INSTALLED = false
 local WF_ORIGINAL_SELECT_DIALOGUE_OPTION = nil
+local WF_RUNTIME_MARKED = false
 
 local function wf_set_int(name, value)
     if type(EEex_GameState_SetGlobalInt) ~= "function" then return false end
@@ -41,6 +44,15 @@ local function wf_safe_call(func_name, fallback)
     return fallback
 end
 
+local function wf_mark_runtime()
+    if WF_RUNTIME_MARKED then return end
+    WF_RUNTIME_MARKED = true
+    wf_set_int("WF_RUNTIME_VERSION", 7)
+    wf_set_int("WF_RUNTIME_REVISION", 2)
+    wf_set_int("WF_RUNTIME_BOOT_SEQ", wf_get_int("WF_RUNTIME_BOOT_SEQ") + 1)
+    wf_set_int("WF_DIALOG_HOOK", 1)
+end
+
 local function wf_store_arg(index, value)
     local number = tonumber(value)
     wf_set_int("WF_DLG_A" .. tostring(index) .. "_NUM", number ~= nil and 1 or 0)
@@ -49,6 +61,7 @@ end
 
 local function wf_capture_dialogue_choice(...)
     local args = {...}
+    wf_mark_runtime()
     local seq = wf_get_int("WF_DIALOG_SEQ") + 1
     wf_set_int("WF_DIALOG_SEQ", seq)
     wf_set_int("WF_DIALOG_ARGC", #args)
@@ -61,32 +74,30 @@ end
 
 local function wf_install_observers()
     if WF_OBSERVERS_INSTALLED then return end
-    WF_OBSERVERS_INSTALLED = true
-
-    -- Persisted heartbeat. The boot sequence distinguishes a fresh EEex start
-    -- from telemetry already present in an older save.
-    wf_set_int("WF_RUNTIME_VERSION", 7)
-    wf_set_int("WF_RUNTIME_BOOT_SEQ", wf_get_int("WF_RUNTIME_BOOT_SEQ") + 1)
 
     local original = Infinity_SelectDialogueOption
-    local dialogue_hook_available = type(original) == "function"
-    wf_set_int("WF_DIALOG_HOOK", dialogue_hook_available and 1 or 0)
+    if type(original) ~= "function" then
+        return
+    end
 
-    if dialogue_hook_available then
-        WF_ORIGINAL_SELECT_DIALOGUE_OPTION = original
-        function Infinity_SelectDialogueOption(...)
-            -- Lua 5.1 forbids using ... inside a nested anonymous function.
-            -- pcall itself accepts the forwarded varargs directly.
-            pcall(wf_capture_dialogue_choice, ...)
-            return WF_ORIGINAL_SELECT_DIALOGUE_OPTION(...)
-        end
+    WF_OBSERVERS_INSTALLED = true
+    WF_ORIGINAL_SELECT_DIALOGUE_OPTION = original
+
+    function Infinity_SelectDialogueOption(...)
+        -- pcall accepts the forwarded varargs directly; no nested vararg
+        -- closure is used, which keeps this valid under the engine's Lua 5.1.
+        pcall(wf_capture_dialogue_choice, ...)
+        return WF_ORIGINAL_SELECT_DIALOGUE_OPTION(...)
     end
 end
 
-if type(EEex_GameState_AddInitializedListener) == "function" then
+if type(EEex_GameState_AddAfterIncludesListener) == "function" then
+    EEex_GameState_AddAfterIncludesListener(wf_install_observers)
+elseif type(EEex_GameState_AddInitializedListener) == "function" then
+    -- Compatibility fallback for older EEex builds. Current EEex exposes the
+    -- after-includes listener, which is preferred for M_*.lua observers.
     EEex_GameState_AddInitializedListener(wf_install_observers)
 else
-    -- Current EEex provides the listener. The fallback remains guarded and
-    -- contains no native UI calls, console instances, or file operations.
+    -- Last-resort guarded fallback. No native UI, console, or file operations.
     pcall(wf_install_observers)
 end
