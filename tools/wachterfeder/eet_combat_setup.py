@@ -7,7 +7,10 @@ import json
 from pathlib import Path
 from typing import Sequence
 
-from tools.wachterfeder.eet_combat_logger import install_logger, logger_status, uninstall_logger
+try:
+    from tools.wachterfeder.eet_combat_logger import install_logger, logger_status, uninstall_logger
+except ModuleNotFoundError:  # direct execution from tools/wachterfeder
+    from eet_combat_logger import install_logger, logger_status, uninstall_logger
 
 
 def repository_root() -> Path:
