@@ -101,58 +101,66 @@ mit den Sicherheitsstufen:
 
 Damit wird eine konkrete Spielerantwort niemals allein aus dem Dialogbaum geraten.
 
-## Optionaler EEex-Combat-Logger
+## Optionaler EEex-Runtime-Logger V3
 
-Wenn EEex im EET-Spielordner installiert ist, kann Wächterfeder zusätzlich einen kleinen Laufzeit-Logger installieren. Das geht jetzt direkt im **EET-Tab der gemeinsamen Wächterfeder-Oberfläche**. Dort werden außerdem sichtbar angezeigt:
+EEex kann zusätzlich als Laufzeit-Sensor dienen. Der **Runtime-Logger V3** beobachtet derzeit zwei Dinge:
 
-```text
-EEex erkannt / nicht erkannt
-Wächterfeder-Logger installiert / nicht installiert
-Log vorhanden / noch kein Log
-```
+- tatsächlichen HP-Verlust rund um die von EEex bereitgestellten Damage-Hooks,
+- tatsächliche Aufrufe von `Infinity_SelectDialogueOption`, also die Auswahl einer Dialogantwort durch den Spieler.
 
-Die Installation erfolgt nur nach einem ausdrücklichen Klick auf **„Combatlogger installieren“** und legt genau eine Modder-Lua-Datei an:
+Die Installation erfolgt nur nach einem ausdrücklichen Klick auf **„Runtime-Logger installieren/aktualisieren“** im EET-Tab und legt genau eine Modder-Lua-Datei an:
 
 ```text
 <BG2EE>\override\M_WFLOG.lua
 ```
 
-Alternativ bleibt der bisherige Helfer verfügbar:
+Der Logger benutzt absichtlich **kein `io.open`**. EEex Minimal kann die Standard-Lua-`io`-Bibliothek ausblenden. Stattdessen wird der von Beamdog/EEex vorgesehene Engine-Logging-Weg `C:LogSet` + `C:LogMessages` verwendet. Die lokale Runtime-Datei liegt im Spielordner:
 
 ```text
-EET Combatlogger installieren.cmd
+<BG2EE>\Wachterfeder-runtime.log
 ```
 
-Das Laufzeitprotokoll bleibt lokal:
+Sie ist kein Repository-Inhalt. Beim Entfernen des Wächterfeder-Runtime-Loggers wird auch diese eindeutig benannte lokale Logdatei nach Möglichkeit entfernt.
+
+Nach dem Start über `InfinityLoader.exe` schreibt V3 zuerst einen `runtime_start`-Heartbeat. Die Oberfläche unterscheidet deshalb zwischen:
 
 ```text
-.wachterfeder/eet/runtime/combat.jsonl
+Runtime-Logger aktuell
+wartet auf InfinityLoader-Start
+Heartbeat empfangen
 ```
 
-Version 1 erfasst tatsächlichen HP-Verlust nach einem EEex-Damage-Effekt, Quelle und Ziel soweit auflösbar, HP vor/nach dem Effekt und `lethal_candidate` bei HP <= 0. `lethal_candidate` ist noch kein separat bestätigter Tod.
+Erst **„Heartbeat empfangen“** bestätigt, dass der Lua-Runtimekanal in dieser Installation wirklich ausgeführt wurde. Ein bloß vorhandenes Script gilt nicht mehr als Beweis für einen funktionierenden Logger.
 
-EET weiterhin ausschließlich über `InfinityLoader.exe` starten.
+### Runtime-Ereignisse
+
+Kampfereignisse enthalten soweit verfügbar Quelle, Ziel, tatsächlichen HP-Verlust, HP vor/nach dem Effekt und `lethal_candidate`. `lethal_candidate` bedeutet nur `HP <= 0` nach diesem Effekt und ist noch kein separat bestätigter Tod.
+
+Bei Dialogen protokolliert V3 zunächst bewusst die rohen Argumente von `Infinity_SelectDialogueOption`, den ausgewählten Charakter, Screen und Game-Ticks. Diese Rohdaten werden **noch nicht automatisch als Dialogtext ausgegeben**. Erst wenn die Argumentstruktur in der realen EET-Installation bestätigt und mit dem lokalen DLG/WeiDU-Resolver verknüpft ist, wird daraus eine konkrete gewählte Antwort.
 
 Die Delta-Ausgabe ergänzt unter anderem:
 
 ```text
-summary.party_hit_point_changes
-summary.party_conversations
-summary.dialogue_events_considered
-summary.dialogue_high_confidence
-summary.dialogue_medium_confidence
+summary.runtime_events
+summary.runtime_starts
+summary.live_dialogue_choices
 summary.combat_events
+summary.combat_damage_total
 ```
 
 und unter `changes`:
 
 ```text
-party_hit_points
-party_conversations
-dialogue_resolution
+runtime_log
 combat_log
+live_dialogue_choices
+runtime_diagnostics
 ```
+
+EET weiterhin über `InfinityLoader.exe` starten.
 
 ## Aussagekraft
 
-Ein gestiegener Gesprächszähler belegt eine neue Interaktion, aber nicht für sich allein die exakte Spielerantwort. Erst eine eindeutige Kombination aus Dialogstruktur und beobachtbaren Save-Änderungen darf eine Antwort als bestätigt markieren. Wo diese Evidenz fehlt, bleibt Wächterfeder ausdrücklich bei einer niedrigeren Sicherheit.
+Ein gestiegener Gesprächszähler belegt eine neue persistente Interaktion, aber nicht für sich allein die exakte Spielerantwort. Direkte Gefährtengespräche erhöhen diesen Zähler nicht zuverlässig, weshalb V3 zusätzlich die tatsächliche Auswahlfunktion der Dialog-UI beobachtet.
+
+Auch beim Livekanal gilt: Wächterfeder trennt **Beobachtung** von **Interpretation**. Eine erfasste Dialogauswahl ist ein starkes Runtime-Signal; der konkrete Antworttext wird erst nach bestätigter Zuordnung zum lokalen Dialogbaum als sicher bezeichnet.
