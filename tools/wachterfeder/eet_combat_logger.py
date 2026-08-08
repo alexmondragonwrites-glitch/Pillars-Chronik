@@ -13,7 +13,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Sequence
 
-from tools.wachterfeder.eet import EetError, resolve_eet_game_assets
+try:
+    from tools.wachterfeder.eet import EetError, resolve_eet_game_assets
+except ModuleNotFoundError:  # direct execution from tools/wachterfeder
+    from eet import EetError, resolve_eet_game_assets
 
 JsonObject = dict[str, Any]
 LOGGER_MARKER = "WACHTERFEDER_EET_COMBAT_LOGGER_V1"
@@ -64,8 +67,6 @@ def logger_status(game_path: Path, *, root: Path | None = None, language: str = 
 
 def _render_template(log_path: Path, *, root: Path) -> str:
     template = (root / TEMPLATE_RELATIVE).read_text(encoding="utf-8")
-    # Lua long-bracket strings accept forward slashes on Windows and avoid
-    # backslash escaping surprises.
     portable = log_path.resolve().as_posix()
     return template.replace("__WACHTERFEDER_LOG_PATH__", portable)
 
@@ -122,11 +123,6 @@ def log_metadata(log_path: Path) -> JsonObject:
 
 
 def read_new_events(log_path: Path, start_offset: int) -> tuple[list[JsonObject], JsonObject]:
-    """Read complete JSON lines appended after ``start_offset``.
-
-    If the log was truncated, reading restarts at zero. Malformed lines are
-    counted but never injected into the chronology delta.
-    """
     try:
         size = log_path.stat().st_size
     except OSError:
