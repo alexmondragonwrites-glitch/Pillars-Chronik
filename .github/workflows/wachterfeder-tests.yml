@@ -5,6 +5,7 @@ on:
     branches: [main, "agent/wachterfeder-*"]
     paths:
       - "Wachterfeder starten.bat"
+      - "Wachterfeder starten.cmd"
       - "tools/wachterfeder/**"
       - ".github/workflows/wachterfeder-tests.yml"
       - ".gitignore"
@@ -65,3 +66,6 @@ jobs:
 
       - name: Test Rogue Trader adapter
         run: python -m unittest tools.wachterfeder.tests.test_rogue_trader -v
+
+      - name: Test three-game desktop shell
+        run: python -m unittest tools.wachterfeder.tests.test_multi_gui -v
