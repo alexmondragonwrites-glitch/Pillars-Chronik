@@ -210,6 +210,87 @@ def _new_journal_texts(delta: Mapping[str, Any]) -> list[str]:
     ]
 
 
+def _split_conversation_event(event: Mapping[str, Any]) -> list[JsonObject]:
+    """Expand one persisted talk-counter jump into individual conversations.
+
+    ``NumTimesTalkedTo`` increments once per conversation start. A save delta of
+    3 -> 6 therefore represents three conversations, not one conversation whose
+    state somehow jumped by three. Keeping those starts separate lets state
+    triggers be evaluated against the correct pre-conversation count.
+    """
+    base = dict(event)
+    try:
+        before = int(event.get("from"))
+        after = int(event.get("to"))
+    except (TypeError, ValueError):
+        return [base]
+    if after <= before + 1:
+        return [base]
+
+    count = after - before
+    result: list[JsonObject] = []
+    for index, talk_count in enumerate(range(before, after), start=1):
+        item = dict(base)
+        item["from"] = talk_count
+        item["to"] = talk_count + 1
+        item["aggregate_from"] = before
+        item["aggregate_to"] = after
+        item["sequence_index"] = index
+        item["sequence_count"] = count
+        result.append(item)
+    return result
+
+
+def _trigger_is_only_talk_count(trigger: str, expected: int) -> bool:
+    compact = re.sub(r"\s+", "", trigger).casefold()
+    return compact == f"numtimestalkedto({expected})".casefold()
+
+
+def _entry_states(graph: Mapping[str, Any], event: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    """Return states that can plausibly be the first state of this conversation.
+
+    Infinity Engine dialogue entry states are checked in file order. A known
+    false NumTimesTalkedTo trigger can be discarded. A matching pure
+    NumTimesTalkedTo trigger or an unconditional state is definitely true and
+    stops the search, while earlier states with other unevaluated conditions
+    remain conservative possibilities.
+    """
+    states = graph.get("states", []) if isinstance(graph.get("states"), list) else []
+    try:
+        observed = int(event.get("from", -1))
+    except (TypeError, ValueError):
+        observed = -1
+
+    possible: list[Mapping[str, Any]] = []
+    for state in states:
+        if not isinstance(state, Mapping):
+            continue
+        trigger = str(state.get("trigger") or "").strip()
+        talk_match = _TALK_TRIGGER_RE.search(trigger)
+
+        if talk_match:
+            expected = int(talk_match.group("count"))
+            if expected != observed:
+                # A mismatching conjunct makes the complete trigger false.
+                continue
+            possible.append(state)
+            if _trigger_is_only_talk_count(trigger, expected):
+                break
+            # Matching talk count plus other conditions remains possible, but
+            # not definitely true, so later states can still be entry states.
+            continue
+
+        if not trigger:
+            possible.append(state)
+            break
+
+        # We do not yet evaluate arbitrary script triggers. Keep the state as a
+        # conservative possibility and continue until a definitely true state.
+        possible.append(state)
+
+    return possible or [state for state in states if isinstance(state, Mapping)]
+
+
 def _score_transition(
     state: Mapping[str, Any],
     transition: Mapping[str, Any],
@@ -280,10 +361,9 @@ def _score_transition(
 def resolve_dialogue_event(event: Mapping[str, Any], graph: Mapping[str, Any], delta: Mapping[str, Any]) -> JsonObject:
     changed_globals = _changed_globals(delta)
     new_journals = _new_journal_texts(delta)
+    entry_states = _entry_states(graph, event)
     candidates: list[JsonObject] = []
-    for state in graph.get("states", []) if isinstance(graph.get("states"), list) else []:
-        if not isinstance(state, Mapping):
-            continue
+    for state in entry_states:
         for transition in state.get("transitions", []) if isinstance(state.get("transitions"), list) else []:
             if not isinstance(transition, Mapping):
                 continue
@@ -310,7 +390,7 @@ def resolve_dialogue_event(event: Mapping[str, Any], graph: Mapping[str, Any], d
         confidence = "low"
         confirmed_reply = None
 
-    return {
+    result: JsonObject = {
         "actor": event.get("actor"),
         "area": event.get("area"),
         "dialog": event.get("dialog") or graph.get("dialog"),
@@ -318,9 +398,15 @@ def resolve_dialogue_event(event: Mapping[str, Any], graph: Mapping[str, Any], d
         "to": event.get("to"),
         "confidence": confidence,
         "confirmed_reply": confirmed_reply,
+        "entry_state_count": len(entry_states),
+        "entry_states": [state.get("label") for state in entry_states],
         "candidate_count": len(top) if top_score > 0 else len(candidates),
         "candidates": top[:5] if top_score > 0 else candidates[:5],
     }
+    for key in ("aggregate_from", "aggregate_to", "sequence_index", "sequence_count"):
+        if key in event:
+            result[key] = event.get(key)
+    return result
 
 
 def resolve_delta_dialogues(
@@ -333,15 +419,20 @@ def resolve_delta_dialogues(
     changes = delta.get("changes", {})
     if not isinstance(changes, Mapping):
         changes = {}
-    events: list[Mapping[str, Any]] = []
+    source_events: list[Mapping[str, Any]] = []
     for key in ("npc_conversations", "party_conversations"):
         value = changes.get(key, [])
         if isinstance(value, list):
-            events.extend(item for item in value if isinstance(item, Mapping) and item.get("dialog"))
+            source_events.extend(item for item in value if isinstance(item, Mapping) and item.get("dialog"))
+
+    events: list[JsonObject] = []
+    for event in source_events:
+        events.extend(_split_conversation_event(event))
 
     assets = resolve_eet_game_assets(game_path, language)
     report: JsonObject = {
         "weidu_available": assets.weidu is not None,
+        "conversation_changes": len(source_events),
         "events_considered": len(events),
         "high_confidence": 0,
         "medium_confidence": 0,
