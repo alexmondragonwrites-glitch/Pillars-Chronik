@@ -1,0 +1,103 @@
+-- WACHTERFEDER_EET_COMBAT_LOGGER_V1
+-- WACHTERFEDER_EEEX_SAFE_LOGGING_V2
+-- WACHTERFEDER_EET_RUNTIME_LOGGER_V3
+-- WACHTERFEDER_EET_RUNTIME_LOGGER_V4
+-- WACHTERFEDER_EET_RUNTIME_LOGGER_V5
+-- WACHTERFEDER_EET_RUNTIME_LOGGER_V6
+-- WACHTERFEDER_EET_SAVE_TELEMETRY_V7
+-- WACHTERFEDER_EET_SAVE_TELEMETRY_V7_1
+-- WACHTERFEDER_EET_SAVE_TELEMETRY_V7_2
+-- Generated into the local EET override folder by Wächterfeder.
+--
+-- V7.2 keeps the safe save-global transport from V7, but changes the hook
+-- timing. M_*.lua files are executed by the game's includes.lua; therefore the
+-- dialogue wrapper is installed through EEex_GameState_AddAfterIncludesListener
+-- so later include/UI initialization cannot replace it again.
+--
+-- Runtime globals are deliberately written only when a real dialogue choice is
+-- observed. Startup globals can be replaced when the player subsequently loads
+-- a save. Writing at dialogue time guarantees that the active game session owns
+-- the WF_* values that will be persisted by the next save.
+
+local WF_OBSERVERS_INSTALLED = false
+local WF_ORIGINAL_SELECT_DIALOGUE_OPTION = nil
+local WF_RUNTIME_MARKED = false
+
+local function wf_set_int(name, value)
+    if type(EEex_GameState_SetGlobalInt) ~= "function" then return false end
+    local number = tonumber(value) or 0
+    return pcall(function() EEex_GameState_SetGlobalInt(name, number) end)
+end
+
+local function wf_get_int(name)
+    if type(EEex_GameState_GetGlobalInt) ~= "function" then return 0 end
+    local ok, value = pcall(function() return EEex_GameState_GetGlobalInt(name) end)
+    if not ok then return 0 end
+    return tonumber(value) or 0
+end
+
+local function wf_safe_call(func_name, fallback)
+    local func = _G[func_name]
+    if type(func) ~= "function" then return fallback end
+    local ok, value = pcall(func)
+    if ok and value ~= nil then return value end
+    return fallback
+end
+
+local function wf_mark_runtime()
+    if WF_RUNTIME_MARKED then return end
+    WF_RUNTIME_MARKED = true
+    wf_set_int("WF_RUNTIME_VERSION", 7)
+    wf_set_int("WF_RUNTIME_REVISION", 2)
+    wf_set_int("WF_RUNTIME_BOOT_SEQ", wf_get_int("WF_RUNTIME_BOOT_SEQ") + 1)
+    wf_set_int("WF_DIALOG_HOOK", 1)
+end
+
+local function wf_store_arg(index, value)
+    local number = tonumber(value)
+    wf_set_int("WF_DLG_A" .. tostring(index) .. "_NUM", number ~= nil and 1 or 0)
+    wf_set_int("WF_DLG_A" .. tostring(index), number or 0)
+end
+
+local function wf_capture_dialogue_choice(...)
+    local args = {...}
+    wf_mark_runtime()
+    local seq = wf_get_int("WF_DIALOG_SEQ") + 1
+    wf_set_int("WF_DIALOG_SEQ", seq)
+    wf_set_int("WF_DIALOG_ARGC", #args)
+    wf_store_arg(1, args[1])
+    wf_store_arg(2, args[2])
+    wf_store_arg(3, args[3])
+    wf_store_arg(4, args[4])
+    wf_set_int("WF_DIALOG_TICKS", wf_safe_call("Infinity_GetGameTicks", -1))
+end
+
+local function wf_install_observers()
+    if WF_OBSERVERS_INSTALLED then return end
+
+    local original = Infinity_SelectDialogueOption
+    if type(original) ~= "function" then
+        return
+    end
+
+    WF_OBSERVERS_INSTALLED = true
+    WF_ORIGINAL_SELECT_DIALOGUE_OPTION = original
+
+    function Infinity_SelectDialogueOption(...)
+        -- pcall accepts the forwarded varargs directly; no nested vararg
+        -- closure is used, which keeps this valid under the engine's Lua 5.1.
+        pcall(wf_capture_dialogue_choice, ...)
+        return WF_ORIGINAL_SELECT_DIALOGUE_OPTION(...)
+    end
+end
+
+if type(EEex_GameState_AddAfterIncludesListener) == "function" then
+    EEex_GameState_AddAfterIncludesListener(wf_install_observers)
+elseif type(EEex_GameState_AddInitializedListener) == "function" then
+    -- Compatibility fallback for older EEex builds. Current EEex exposes the
+    -- after-includes listener, which is preferred for M_*.lua observers.
+    EEex_GameState_AddInitializedListener(wf_install_observers)
+else
+    -- Last-resort guarded fallback. No native UI, console, or file operations.
+    pcall(wf_install_observers)
+end

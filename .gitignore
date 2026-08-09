@@ -1,0 +1,8 @@
+# Wächterfeder verarbeitet Spielressourcen nur lokal.
+.wachterfeder/
+*.savegame
+Dialog*.7z
+
+# Python
+__pycache__/
+*.py[cod]
