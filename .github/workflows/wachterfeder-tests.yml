@@ -2,9 +2,10 @@ name: Wächterfeder tests
 
 on:
   pull_request:
-    branches: [main, agent/wachterfeder-mvp]
+    branches: [main, "agent/wachterfeder-*"]
     paths:
       - "Wachterfeder starten.bat"
+      - "Wachterfeder starten.cmd"
       - "tools/wachterfeder/**"
       - ".github/workflows/wachterfeder-tests.yml"
       - ".gitignore"
@@ -62,3 +63,9 @@ jobs:
 
       - name: Test Baldur's Gate EET adapter
         run: python -m unittest tools.wachterfeder.tests.test_eet -v
+
+      - name: Test Rogue Trader adapter
+        run: python -m unittest tools.wachterfeder.tests.test_rogue_trader -v
+
+      - name: Test three-game desktop shell
+        run: python -m unittest tools.wachterfeder.tests.test_multi_gui -v
