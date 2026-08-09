@@ -2,7 +2,7 @@ name: Wächterfeder tests
 
 on:
   pull_request:
-    branches: [main, agent/wachterfeder-mvp]
+    branches: [main, "agent/wachterfeder-*"]
     paths:
       - "Wachterfeder starten.bat"
       - "tools/wachterfeder/**"
@@ -62,3 +62,6 @@ jobs:
 
       - name: Test Baldur's Gate EET adapter
         run: python -m unittest tools.wachterfeder.tests.test_eet -v
+
+      - name: Test Rogue Trader adapter
+        run: python -m unittest tools.wachterfeder.tests.test_rogue_trader -v
