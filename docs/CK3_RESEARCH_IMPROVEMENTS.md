@@ -27,7 +27,7 @@ Daraus folgen zwei Wächterfeder-Regeln:
 
 ### CK3 Events
 
-Paradox dokumentiert für CK3, dass Events persistenten Zustand erzeugen können, beispielsweise automatisch verwaltete Cooldowns. Event-Debugging zeigt zudem Trigger, Scope-Kontext und Lokalisierungsdaten. Persistenter Save-Zustand ist deshalb wertvoll, aber nicht gleichbedeutend mit einem vollständigen Klickprotokoll.
+Paradox dokumentiert für CK3, dass Events persistenten Zustand erzeugen können, beispielsweise automatisch verwaltete Cooldowns. Persistenter Save-Zustand ist deshalb wertvoll, aber nicht gleichbedeutend mit einem vollständigen Klickprotokoll.
 
 Quelle:
 - https://www.paradoxinteractive.com/games/crusader-kings-iii/news/dev-diary-87-royal-modding
@@ -45,62 +45,43 @@ Die Wächterfeder trennt deshalb weiterhin:
 
 `ck3_enhanced.py` steigt durch Manager-Wrapper wie `database` hindurch und sucht erst darunter nach inhaltlichen Datensätzen mit Typ, Event-ID, Datum, State und beteiligten Charakteren.
 
-Damit soll ein Memory nicht mehr als
-
-```json
-{"id":"database"}
-```
-
-enden, wenn darunter ein konkreter Memory-Datensatz liegt.
-
 ### 2. Kompakte Delta-Version 2
 
-Das Delta vergleicht nur einen kleinen Kernzustand:
-
-- Datum und Version,
-- Herrscherwerte,
-- Primärtitel,
-- Erbfolge,
-- Familien-IDs,
-- Vasallenanzahl,
-- aktive Kriegs-IDs.
-
-Größere Familien-, Vasallen- oder Eventobjekte werden nur dann in das Delta geschrieben, wenn sie als semantisches Ereignis relevant sind.
+Das Delta vergleicht nur einen kleinen Kernzustand. Größere Familien-, Vasallen- oder Eventobjekte werden nur dann in das Delta geschrieben, wenn sie als semantisches Ereignis relevant sind.
 
 ### 3. Semantische Timeline
 
-Aus zwei Saves werden unter anderem erzeugt:
-
-- `child_added`,
-- `spouse_added` / `spouse_removed`,
-- `death`,
-- `title_gained` / `title_lost`,
-- `vassal_added` / `vassal_removed`,
-- `war_observed_started` / `war_observed_ended`,
-- `succession_changed`,
-- `trait_gained` / `trait_lost`,
-- Glaubens-, Kultur- und Regierungswechsel,
-- neue Memories, Stories und wichtige Aktionen.
-
-Der Begriff `observed` bei Kriegen ist absichtlich konservativ: Ein Delta belegt, dass der Krieg zwischen zwei Saves auftaucht bzw. verschwindet, nicht zwingend den exakten Zeitpunkt des Starts oder Endes.
+Aus zwei Saves werden unter anderem Kinder, Ehepartner, Todesfälle, Titel, Vasallen, Kriege, Nachfolge, Traits sowie Glaubens-, Kultur- und Regierungswechsel als Timeline-Kandidaten erzeugt.
 
 ### 4. Nachfolgeanalyse
 
-Der Snapshot erhält einen eigenen Analyseblock mit aufgelöster Nachfolgelinie und Primärerbe, soweit die Charakter-IDs im Save auflösbar sind.
+Der Snapshot enthält eine aufgelöste Nachfolgelinie mit Primärerbe, soweit die Charakter-IDs im Save auflösbar sind.
 
 ### 5. Vasallen-Watchlist
 
-Direkte Vasallen werden nach gespeicherten Macht-/Stärkewerten beobachtet. Die Watchlist erzeugt `low`, `medium` oder `high` Aufmerksamkeit.
-
-Wichtig: Das ist ausdrücklich eine Heuristik und kein Ersatz für CK3-Meinung, Fraktionsstatus oder die militärische UI-Anzeige.
+Direkte Vasallen werden nach gespeicherten Macht-/Stärkewerten beobachtet. Nach dem zweiten Real-Save-Test wurde die Heuristik geschärft: Ein abweichender Glaube wird nur noch als Kontextflag geführt und erhöht allein nicht die Aufmerksamkeitsstufe.
 
 ### 6. Kriegstitel bereinigen
 
-CK3-interne UI-Tokens wie `ONCLICK`, `TOOLTIP` und Lokalisierungsmarker werden aus sichtbaren Kriegstiteln entfernt. Ein realer Testtitel wie der masandaranische Anspruch auf Tabaristan wird dadurch wieder lesbar.
+CK3-interne UI-Tokens wie `ONCLICK`, `TOOLTIP` und Lokalisierungsmarker werden aus sichtbaren Kriegstiteln entfernt.
 
 ### 7. Rakaly-Komfort
 
 Nach erfolgreicher Auswahl merkt Wächterfeder den lokalen Rakaly-Pfad. Beim nächsten Start wird er automatisch wieder angeboten.
+
+### 8. Real-Save-Refinements
+
+`ck3_refined.py` ergänzt auf Basis eines echten CK3-1.19.0.5-Ironman-Saves:
+
+- Event-Teilnehmer werden nach Möglichkeit auf Charaktername + ID aufgelöst.
+- `end_date` an Memory-/Eventdatensätzen wird als Roh-End-/Ablaufwert behandelt und ausdrücklich nicht als Ereignisdatum erzählt.
+- Aktive Kriege erhalten Rollenauflösung, Gegner, Lehnsherr-Bezug, Casus Belli und Zieltitel.
+- Gespeicherte Teilnehmerverluste und Attrition bleiben getrennt, solange ihre exakte Summensemantik nicht belegt ist.
+- Direkte Vasallen, in deren aktuellem `succession`-Feld der Spieler steht, werden als vorsichtige `inheritance_opportunities` hervorgehoben.
+- Lehnsherr-Kontext enthält den gespeicherten Strength-Vergleich und ob aktuell ein Krieg gegen den Lehnsherrn läuft.
+- Der Desktop zeigt den strategischen Kontext direkt unter dem CK3-Status.
+
+Die Detailfunde sind zusätzlich in `docs/CK3_REAL_SAVE_FINDINGS.md` dokumentiert.
 
 ## Bewusst noch nicht geraten
 
