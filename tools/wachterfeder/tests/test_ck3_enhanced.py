@@ -12,6 +12,7 @@ from tools.wachterfeder.ck3_enhanced import (
     normalize_ck3_state,
     remember_rakaly,
 )
+from tools.wachterfeder.ck3_enhanced_runtime import build_ck3_delta as build_migration_safe_delta
 from tools.wachterfeder.tests.test_ck3 import synthetic_state
 
 
@@ -94,6 +95,41 @@ class Ck3EnhancedTests(unittest.TestCase):
         self.assertNotIn("state", delta["changes"])
         self.assertIn("headline_state", delta["changes"])
         self.assertEqual(delta["current_state"]["primary_heir_name"], "Astrid")
+
+    def test_schema_migration_does_not_invent_timeline_events(self) -> None:
+        old_raw = synthetic_state()
+        old_state = normalize_ck3_state(old_raw)
+
+        new_raw = copy.deepcopy(old_raw)
+        new_raw["character_memory_manager"] = {
+            "database": {
+                "1": {
+                    "memory-42": {
+                        "owner": 1,
+                        "type": "wedding",
+                        "date": "867.1.2",
+                    }
+                }
+            }
+        }
+        new_state = normalize_ck3_state(new_raw)
+
+        previous = {"schema_version": 1, "sha256": "old", "state": old_state}
+        current = {
+            "schema_version": 2,
+            "sha256": "new",
+            "deep_analysis": True,
+            "fallback_metadata": {},
+            "state": new_state,
+        }
+        delta = build_migration_safe_delta(previous, current)
+
+        self.assertEqual(delta["summary"]["schema_migration"], {"from": 1, "to": 2})
+        self.assertEqual(delta["summary"]["headline_state_changes"], 0)
+        self.assertEqual(delta["summary"]["timeline_candidates"], 0)
+        self.assertEqual(delta["changes"]["headline_state"], {})
+        self.assertEqual(delta["changes"]["timeline_candidates"], [])
+        self.assertFalse(delta["initial_snapshot"])
 
     def test_remembers_selected_rakaly_locally(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
