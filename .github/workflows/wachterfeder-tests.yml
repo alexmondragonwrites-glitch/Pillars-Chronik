@@ -69,3 +69,9 @@ jobs:
 
       - name: Test three-game desktop shell
         run: python -m unittest tools.wachterfeder.tests.test_multi_gui -v
+
+      - name: Test Crusader Kings III adapter
+        run: python -m unittest tools.wachterfeder.tests.test_ck3 -v
+
+      - name: Test four-game desktop shell
+        run: python -m unittest tools.wachterfeder.tests.test_multi_gui4 -v
