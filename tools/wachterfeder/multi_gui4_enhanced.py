@@ -7,10 +7,10 @@ import tkinter as tk
 
 try:
     import tools.wachterfeder.multi_gui4 as ui
-    from tools.wachterfeder.ck3_enhanced import analyse_ck3_save, find_rakaly
+    from tools.wachterfeder.ck3_enhanced_runtime import analyse_ck3_save, find_rakaly
 except ModuleNotFoundError:  # Direct execution from tools/wachterfeder.
     import multi_gui4 as ui
-    from ck3_enhanced import analyse_ck3_save, find_rakaly
+    from ck3_enhanced_runtime import analyse_ck3_save, find_rakaly
 
 # The inherited CK3 tab resolves these names from the multi_gui4 module at run
 # time. Swap in the enhanced adapter without duplicating the whole four-tab UI.
@@ -25,10 +25,15 @@ class EnhancedFourGameWachterfederApp(ui.FourGameWachterfederApp):
         depth = "Tiefe Analyse aktiv" if result.deep_analysis else "Metadatenmodus (Rakaly noch nicht gefunden)"
 
         current = {}
+        migration = None
         try:
             payload = json.loads(result.delta_path.read_text(encoding="utf-8"))
-            if isinstance(payload, dict) and isinstance(payload.get("current_state"), dict):
-                current = payload["current_state"]
+            if isinstance(payload, dict):
+                if isinstance(payload.get("current_state"), dict):
+                    current = payload["current_state"]
+                summary = payload.get("summary")
+                if isinstance(summary, dict):
+                    migration = summary.get("schema_migration")
         except (OSError, json.JSONDecodeError):
             pass
 
@@ -40,10 +45,17 @@ class EnhancedFourGameWachterfederApp(ui.FourGameWachterfederApp):
             ratio_text = f" · Machtwert-Anteil ca. {float(ratio) * 100:.1f}%" if isinstance(ratio, (int, float)) else ""
             top_line = f"\nVasallen-Watch: {top['name']} · {top.get('attention', 'unbekannt')}{ratio_text}"
 
+        migration_line = ""
+        if isinstance(migration, dict):
+            migration_line = (
+                f"\nParser-Basis aktualisiert: Schema {migration.get('from')} → {migration.get('to')} "
+                "(keine falschen Timeline-Ereignisse erzeugt)"
+            )
+
         self.ck3_status.set(
             f"Fertig: {result.save_file.name}\n"
             f"{ui.delta_state(result.initial_snapshot, result.has_changes)}\n"
-            f"{depth}\n\n"
+            f"{depth}{migration_line}\n\n"
             f"Version: {result.game_version or 'unbekannt'}\n"
             f"Herrscher: {result.player_name or 'noch nicht tief aufgelöst'}\n"
             f"Primärtitel: {result.primary_title or 'noch nicht tief aufgelöst'}\n"
